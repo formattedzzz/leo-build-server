@@ -1,0 +1,5 @@
+这是cache文件夹
+var obj = {
+  name: 'xiaolin',
+  age: 22
+}

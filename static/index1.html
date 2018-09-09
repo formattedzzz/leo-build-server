@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>卡片</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="/index.css" />
+</head>
+<body id="body">
+    <div class="card-item">
+        <div class="card-out">
+            <div class="card-in">
+                
+            </div>
+
+            <span class="next">
+                <span></span>
+            </span>
+
+            <h5 class="get-info">点击一下翻看卡片背哦</h5>
+            <span class="card-save">保存图片</span>
+            <h5 class="get-info">已有268人获得了这张卡片</h5>
+            <form action="http://localhost:7006/api/v1" method="post" enctype="multipart/form-data">
+                <input type="file" name="postimg" accept="image/png, image/jpeg, image/gif" id="" multiple>
+                <button type="submit">提交</button>
+            </form>
+        </div>
+    </div>
+    <div class="imgshare">
+        <div class="btn-con">
+            <span class="cancel">取消</span>
+            <span class="share">分享</span>            
+        </div>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.2.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <script type="text/javascript" src="/domtoimg.js"></script>
+<script>
+
+window.onload=function(){
+    // font init
+    let html = document.getElementsByTagName("html")[0];
+    let oWidth = document.body.clientWidth || document.documentElement.clientWidth;
+    html.style.fontSize = oWidth/23.43 + "px";
+
+    let imgArea = document.getElementsByClassName('card-item')[0]
+    let imgshare = document.getElementsByClassName('imgshare')[0]
+    let cancel = imgshare.getElementsByClassName('cancel')[0]
+    let share = imgshare.getElementsByClassName('share')[0]
+    let savebtn = document.getElementsByClassName('card-save')[0]
+    let imgsrc = null
+
+    savebtn.addEventListener('touchend',function(){
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                post1: [1,2,3],
+                post2: 'string'
+            },
+            // url: '/api/v2?from=sameorigin',
+            url: 'http://localhost:7006/api/v1?port=7003&origin=same',
+            success: function(res){
+                console.log(res)
+            }
+        }) 
+
+        // domtoimage.toPng(imgArea)
+        // .then(function (dataUrl) {
+        //     imgsrc = dataUrl
+        //     let img = new Image()
+        //     img.src = dataUrl
+        //     imgshare.appendChild(img)
+        //     imgshare.style.display = 'block'
+        // })
+
+        // // domtoimage.toJpeg(imgArea, { quality: 0.95 })
+        // // .then(function (dataUrl) {
+        // //     var link = document.createElement('a');
+        // //     link.download = 'my-image-name.jpeg';
+        // //     link.href = dataUrl;
+        // //     link.click();
+        // // })
+
+        // .catch(function (error) {
+        //     console.error('图片转不了：', error)
+        //     });
+        // },false)
+        // cancel.addEventListener('touchend',function(){
+        //     imgshare.style.display = 'none'
+        // },false)
+        // share.addEventListener('touchend',function(){
+        //     wx.miniProgram.postMessage({ data: imgsrc })
+        //     wx.miniProgram.navigateBack({
+        //         delta: 1
+        //     })
+        
+    })
+    // wx.miniProgram.navigateTo({url: '/register/pages/index/main'})
+    // wx.miniProgram.postMessage({ data: 'foo' })
+    // wx.miniProgram.postMessage({ data: {foo: 'bar'} })    
+}
+
+
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>    
+<html>    
+<head>    
+<meta charset="UTF-8">    
+<title>showImages</title>    
+<style type="text/css">   
+    .float{    
+        float:left;    
+        width : 200px;    
+        height: 200px;    
+        overflow: hidden;    
+        border: 1px solid #CCCCCC;    
+        border-radius: 10px;    
+        padding: 5px;    
+        margin: 5px;    
+    }    
+    img{    
+        position: relative;    
+    }    
+    .result{    
+        width: 200px;    
+        height: 200px;    
+        text-align: center;    
+        box-sizing: border-box;    
+    }   
+    #select_sence{  
+        display: none;  
+    }  
+    .delete{  
+        width: 200px;  
+        height:200px;  
+        position: absolute;  
+        text-align: center;  
+        line-height: 200px;  
+        z-index: 10;  
+        font-size: 30px;  
+        background-color: rgba(255,255,255,0.8);  
+        color: #f00;  
+        opacity: 0;  
+        transition-duration: 0.7s;  
+        -webkit-transition-duration: 0.7s;   
+    }  
+    .delete:hover{  
+        cursor: pointer;  
+        opacity: 1;  
+    }      
+</style>    
+    
+    
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>    
+<script type="text/javascript">    
+    
+    
+window.onload = function(){       
+    var result;    
+    var dataArr = []; 
+    var fd;   
+    var oSelect = document.getElementById("select");  
+    var oAdd = document.getElementById("add");  
+    var oSubmit = document.getElementById("submit");  
+    var oInput = document.getElementById("select_sence");  
+     
+    if(typeof FileReader==='undefined'){    
+        alert("抱歉，你的浏览器不支持 FileReader");
+        var fileInputs = document.getElementsByClassName('_file') 
+        for (let i = 0; i < fileInputs.length; i++) {
+            fileInputs[i].setAttribute('disabled','disabled');
+        }
+    }else{    
+        oInput.addEventListener('change',readFile,false);    
+    }
+    oInput.value = ""
+
+    oSelect.onclick=function(){   
+        oInput.value = "";
+        $('.float').remove();  
+        dataArr = [];   
+        index = 0;          
+        oInput.click();   
+    }   
+    oAdd.onclick=function(){  
+        oInput.value = ""; 
+        oInput.click();   
+    }   
+    oSubmit.onclick=function(){    
+        if(!dataArr.length){    
+            return alert('请先选择文件');    
+        }    
+        send();    
+    } 
+    
+    function readFile(){   
+        fd = new FormData();    
+        var iLen = this.files.length;
+        console.log(this.files)  
+        var index = 0;  
+        for(var i=0;i<iLen;i++){ 
+             
+            if (!oInput['value'].match(/.jpg|.gif|.png|.jpeg|.bmp/i)){　  
+                return alert("上传的图片格式不正确，请重新选择");    
+            }  
+            var reader = new FileReader();  
+            reader.index = i;    
+            fd.append(i,this.files[i]);  
+            reader.readAsDataURL(this.files[i]); 
+            reader.fileName = this.files[i].name;  
+            reader.onload = function(e){   
+                var imgMsg = {    
+                    name : this.fileName,  
+                    base64 : this.result   
+                }   
+                dataArr.push(imgMsg);    
+                result = `<div class="delete">delete</div><div class="result"><img src="${this.result}" alt=""/></div>`;    
+                var imgcon = document.createElement('div');  
+                imgcon.innerHTML = result;    
+                imgcon['className'] = 'float';  
+                imgcon['index'] = index;    
+                document.getElementsByTagName('body')[0].appendChild(imgcon);     
+                var img = imgcon.getElementsByTagName('img')[0];  
+                img.onload = function(){    
+                    var nowHeight = ReSizePic(this);   
+                    this.parentNode.style.display = 'block';    
+                    var oParent = this.parentNode;    
+                    if(nowHeight){    
+                        oParent.style.paddingTop = (oParent.offsetHeight - nowHeight)/2 + 'px';    
+                    }    
+                }   
+                imgcon.onclick = function(){  
+                    this.remove();                   
+                    delete dataArr[this.index];
+                }  
+                index++;  
+            }    
+        }    
+    }    
+    
+    function send(){     
+    }    
+    
+}    
+
+function ReSizePic(ThisPic) {    
+    var RePicWidth = 200; 
+    
+    var TrueWidth = ThisPic.width; 
+    var TrueHeight = ThisPic.height;  
+        
+    if(TrueWidth>TrueHeight){
+        var reWidth = RePicWidth;    
+        ThisPic.width = reWidth;  
+        var nowHeight = TrueHeight * (reWidth/TrueWidth);    
+        return nowHeight; 
+    }else{   
+        var reHeight = RePicWidth;    
+        ThisPic.height = reHeight;    
+    }    
+}    
+             
+</script>   
+<style>
+</style> 
+</head>    
+    <body>    
+        <div class="container">
+            <label>请选择场地图片：</label>  
+            <button data-flag="entry" id="select">场地入口</button>
+            <button data-flag="inner" id="add">场地内部</button>  
+            <input name="image" accept="image/png, image/jpeg, image/gif" type="file" class="_file" id="select_sence" multiple/>   
+            <button type="submit" id="submit">提交上传</button>                    
+        </div>    
+    </body>
+</html>  
