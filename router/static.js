@@ -30,7 +30,7 @@ function getContentType(str) {
     case 'mp3':
       return 'audio/mp3'
       break;
-    case 'html' || 'htx' || 'htm' || 'jsp':
+    case 'html':
       return 'text/html'
       break;
     default:
@@ -43,15 +43,16 @@ router.get('*', function (req, res) {
  
   let type = /\.(\w+)$/.exec(pathurl) ? /\.(\w+)$/.exec(pathurl)[1] : ''
 
-  console.log(pathurl, type, getContentType(type) + ';charset=utf-8')
+  // console.log(pathurl, type, getContentType(type) + ';charset=utf-8')
   res.set('Content-Type', getContentType(type) + ';charset=utf-8')
   // res.set('Content-Type', 'application/octet-stream;charset=utf-8')
   // res.set('Content-Type', 'image/jpg; charset=utf-8')
   let url = path.resolve(__dirname, '../static' + pathurl)
   fs.readFile(url, function (err, data) {
     if (err) {
-      console.log('没有对应的资源文件')
-      res.send('没有对应的资源文件，请检查你的路径是否正确')
+      // console.log('没有对应的资源文件')
+      res.send(`<h1 style="text-align: center;font-size: 30px;font-weight: 300;margin-top: 50px;">
+      没有对应的资源文件，请检查你的路径是否正确</h1>`)
     } else {
       // console.log(data)
       res.send(data)
