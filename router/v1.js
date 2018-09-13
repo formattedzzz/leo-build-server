@@ -92,7 +92,8 @@ router.get('/v4', function(req, res){
 console.log(process.env.NODE_ENV)
 router.get('/v2', function(req, res){
 
-    let sql = 'SELECT * FROM USERINFO'
+    // let sql = 'SELECT * FROM USERINFO'
+
     conection.query(sql, function(err, result){
         if (err) {
             console.log(err)
@@ -101,4 +102,9 @@ router.get('/v2', function(req, res){
         }
     })
 })
+function getSql (...params) {
+    let sql = ''
+    // ....
+    return sql
+}
 module.exports = router
