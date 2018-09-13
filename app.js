@@ -12,12 +12,10 @@ let app = express()
 let config = require('./config')
 
 app.use(express.static(path.join(__dirname, 'static')))
-
 app.use(bodyParser.urlencoded({extended:false}))
-
 app.use(bodyParser.json())
-
 app.use(cookieParser())
+
 app.all('/api/*', function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
     res.header('Access-Control-Allow-Headers', 'x-Request-with')
@@ -40,6 +38,17 @@ let v1 = require('./router/v1')
 let static = require('./router/static')
 app.use('/api', v1)
 app.use('/static', static)
+app.get('/', function (req, res) {
+    // 如果请求中的 cookie 存在 isVisit, 则输出 cookie
+    // 否则，设置 cookie 字段 isVisit, 并设置过期时间为1分钟
+    if (req.cookies.isVisit) {
+        console.log(req.cookies);
+        res.send("再次欢迎访问");
+    } else {
+        res.cookie('isVisit', 1, {maxAge: 30 * 1000});
+        res.send("欢迎第一次访问");
+    }
+});
 app.listen(config.port, (err)=>{
     if(err){
         console.log(err)
