@@ -51,8 +51,10 @@ router.get('*', function (req, res) {
   fs.readFile(url, function (err, data) {
     if (err) {
       // console.log('没有对应的资源文件')
-      res.send(`<h1 style="text-align: center;font-size: 30px;font-weight: 300;margin-top: 50px;">
-      没有对应的资源文件，请检查你的路径是否正确</h1>`)
+      res.json({
+        code: 0,
+        message: '没有找到相应资源，请检查路径'
+      })
     } else {
       // console.log(data)
       res.send(data)
