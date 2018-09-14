@@ -27,37 +27,7 @@ router.get('/v3', function (req, res) {
         })
     })
 })
-router.get('/login', function (req, res) {
-    const code = req.query.code
-    const appid = 'wxb44a677abfabfc2c'
-    const secret = 'ed69bd6509b8fe98312ada51cbb55047'
-    // const { code, encryptedData, iv } = req.payload
-    Axios({
-        url: 'https://api.weixin.qq.com/sns/jscode2session',
-        method: 'GET',
-        params: {
-            appid,
-            secret,
-            js_code: code,
-            grant_type: 'authorization_code'
-        }
-    }).then((response) => {
-        console.log(response.data)
-        res.json(response.data)
-    })
-    // request(`https://api.weixin.qq.com/sns/jscode2session?appid=wxb44a677abfabfc2c&secret=ed69bd6509b8fe98312ada51cbb55047&js_code=${code}&grant_type=authorization_code`, function (error, response, body) {
-    //     if (error !== null) {
-    //         res.json({
-    //             data: body
-    //         })
-    //     } else {
-    //         res.json({
-    //             code: 0,
-    //             message: '获取失败'
-    //         })
-    //     }
-    // })
-})
+
 router.get('/admin', function (req, res) {
     res.json({
         name: 'xiaolin',
