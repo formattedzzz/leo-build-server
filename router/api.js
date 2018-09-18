@@ -5,15 +5,27 @@ let path = require('path')
 let http = require('http')
 let fs = require('fs')
 let querystring = require('querystring')
-var request = require('request');
-var Axios = require('axios')
+let request = require('request')
+let Sequelize = require('sequelize')
+// let sequelize = require('../utils/sequelize.js')
 
 // conection.connect()
 
-router.get('/v1', function (req, res) {
-    res.set('Content-Type', 'text/html')
-    res.sendFile(path.resolve(__dirname, '../static/index1.html'))
-})
+// const User = sequelize.define('user', {
+//     firstName: {
+//       type: Sequelize.STRING
+//     },
+//     lastName: {
+//       type: Sequelize.STRING
+//     }
+//   })
+//   User.sync().then(() => {
+//     return User.create({
+//       firstName: 'John',
+//       lastName: 'Hancock'
+//     })
+//   })
+
 
 router.get('/v3', function (req, res) {
     request('https://github.com/request/request', function (error, response, body) {
@@ -95,10 +107,6 @@ router.post('/v1', function (req, res) {
         }
     })
 })
-router.get('/v4', function (req, res) {
-    res.send(process.env)
-})
-console.log(process.env.NODE_ENV)
 // router.get('/v2', function(req, res){
 
 //     let sql = 'SELECT * FROM USERINFO'
@@ -111,11 +119,6 @@ console.log(process.env.NODE_ENV)
 //         }
 //     })
 // })
-function getSql(...params) {
-    let sql = ''
-    // ....
-    return sql
-}
 function httpGet(host, data, path, status) {
     console.log('===================HttpGet=====================')
     let options = {

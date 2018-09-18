@@ -1,15 +1,15 @@
 let path = require('path')
 let express = require('express')
-
 let bodyParser = require('body-parser')
-
 let cookieParser = require('cookie-parser')
 let session = require('express-session')
 let history = require('connect-history-api-fallback')
+let config = require('./config')
 let app = express()
 // app.use(history)
 
-let config = require('./config')
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'jade')
 
 app.use(express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.urlencoded({extended:false}))
@@ -25,8 +25,7 @@ app.all('/api/*', function (req, res, next) {
     res.header('Content-Type', 'application/json;charset=utf-8')
     next()
 })
-
-let seeionKey = 'leo'
+// let seeionKey = 'leo'
 // app.use(session({
 //     name: seeionKey,
 //     secret:'this is the secret for cookie',
@@ -34,23 +33,27 @@ let seeionKey = 'leo'
 //     resave: false, 
 //     cookie: { maxAge: 60 * 1000 * 24 }
 // }))
-let v1 = require('./router/v1')
+
+let api = require('./router/api')
 let static = require('./router/static')
 let wxapi = require('./router/wxapi')
-app.use('/api', v1)
+let views = require('./router/views')
+app.use('/api', api)
 app.use('/static', static)
 app.use('/wx', wxapi)
-app.get('/', function (req, res) {
-    // 如果请求中的 cookie 存在 isVisit, 则输出 cookie
-    // 否则，设置 cookie 字段 isVisit, 并设置过期时间为1分钟
-    if (req.cookies.isVisit) {
-        console.log(req.cookies)
-        res.send("再次欢迎访问")
-    } else {
-        res.cookie('isVisit', 1, {maxAge: 30 * 1000})
-        res.send("欢迎第一次访问")
-    }
-})
+app.use('/views', views)
+// app.get('/', function (req, res) {
+//     // 如果请求中的 cookie 存在 isVisit, 则输出 cookie
+//     // 否则，设置 cookie 字段 isVisit, 并设置过期时间为1分钟
+//     if (req.cookies.isVisit) {
+//         console.log(req.cookies)
+//         res.send("再次欢迎访问")
+//     } else {
+//         res.cookie('isVisit', 1, {maxAge: 30 * 1000})
+//         res.send("欢迎第一次访问")
+//     }
+// })
+
 app.listen(config.port, (err)=>{
     if(err){
         console.log(err)
