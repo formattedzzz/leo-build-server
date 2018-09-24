@@ -6,26 +6,6 @@ let http = require('http')
 let fs = require('fs')
 let querystring = require('querystring')
 let request = require('request')
-let Sequelize = require('sequelize')
-// let sequelize = require('../utils/sequelize.js')
-
-// conection.connect()
-
-// const User = sequelize.define('user', {
-//     firstName: {
-//       type: Sequelize.STRING
-//     },
-//     lastName: {
-//       type: Sequelize.STRING
-//     }
-//   })
-//   User.sync().then(() => {
-//     return User.create({
-//       firstName: 'John',
-//       lastName: 'Hancock'
-//     })
-//   })
-
 
 router.get('/v3', function (req, res) {
     request('https://github.com/request/request', function (error, response, body) {

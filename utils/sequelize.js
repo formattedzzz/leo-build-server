@@ -13,9 +13,9 @@ const sequelize = new Sequelize('account', 'root', 'lfl730811', {
 sequelize
   .authenticate()
   .then(() => {
-    console.log('Connection has been established successfully.')
+    console.log('Connection successfully.')
   })
   .catch(err => {
-    console.error('Unable to connect to the database:', err)
+    console.error('Connection failed.', err)
   })
 module.exports = sequelize

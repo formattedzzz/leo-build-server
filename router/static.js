@@ -50,7 +50,7 @@ router.get('*', function (req, res) {
   let url = path.resolve(__dirname, '../static' + pathurl)
   fs.readFile(url, function (err, data) {
     if (err) {
-      // console.log('没有对应的资源文件')
+      res.header('Content-Type', 'application/json;charset=utf-8')
       res.json({
         code: 0,
         message: '没有找到相应资源，请检查路径'
