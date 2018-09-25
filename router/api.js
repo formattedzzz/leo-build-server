@@ -6,6 +6,7 @@ let http = require('http')
 let fs = require('fs')
 let querystring = require('querystring')
 let request = require('request')
+let {SessionTable} = require('../models/model.js')
 
 router.get('/v3', function (req, res) {
     request('https://github.com/request/request', function (error, response, body) {
@@ -21,10 +22,13 @@ router.get('/v3', function (req, res) {
 })
 
 router.get('/admin', function (req, res) {
-    res.json({
-        name: 'xiaolin',
-        age: 22
-    })
+    (async function (){
+        let result = await SessionTable.findAll({where: {openid: 'openid'}})
+        // console.log(result)  
+        res.json({
+            data: result
+        })
+    })()
 })
 
 router.post('/v1', function (req, res) {

@@ -11,7 +11,7 @@ const sequelize = new Sequelize('account', 'root', 'lfl730811', {
   // storage: 'path/to/database.sqlite'
 })
 sequelize
-  .authenticate()
+  .sync()
   .then(() => {
     console.log('Connection successfully.')
   })
