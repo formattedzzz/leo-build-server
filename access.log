@@ -1,0 +1,2 @@
+::1 - - [26/Sep/2018:11:15:45 +0000] 15.585 ms "GET  /api/admin HTTP/1.1" 304 - "-"
+::1 - - [26/Sep/2018:11:41:31 +0000] 102.313 ms "GET  /static/img/full1.jpg HTTP/1.1" 304 - "https://servicewechat.com/wxb44a677abfabfc2c/devtools/page-frame.html"

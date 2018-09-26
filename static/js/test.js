@@ -31,7 +31,8 @@ let insert = async function(){
         }, 0)
     })
 }
-console.log(await insert())
-console.log(456)
+// let aaa = await insert()
+// console.log(aaa)
+// console.log(456)
 
 window.addEventListener('scroll', throttle(handle(123), 1000));

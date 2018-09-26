@@ -1,13 +1,16 @@
 let path = require('path')
+let fs = require('fs')
 let express = require('express')
 let bodyParser = require('body-parser')
 let cookieParser = require('cookie-parser')
 let session = require('express-session')
 let SessionStore = require('express-mysql-session')
 // let history = require('connect-history-api-fallback')
-let config = require('./config')
+let morgan = require('morgan')
 let app = express()
-let { host, port, user, password, database } = require('./config')
+let { host, password, database } = require('./config')
+let accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+let morganStr = ':remote-addr - :remote-user [:date[clf]] :response-time ms ":method  :url HTTP/:http-version" :status :res[content-length] ":referrer"'
 let mysqlOptions = {
     host,
     port: 3306,
@@ -15,10 +18,12 @@ let mysqlOptions = {
     password,
     database
 }
+// let totalServer = require('http').createServer(app)
+// let IO = require('socket.io')(totalServer)
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
-
+app.use(morgan(morganStr, { stream: accessLogStream }))
 app.use(express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -63,12 +68,8 @@ app.use('/static', static)
 app.use('/wx', wxapi)
 app.use('/views', views)
 
-app.listen(config.port, (err) => {
-    if (err) {
-        console.log(err)
-    } else {
-        console.log(`server is runing at port localhost: ${config.port}`)
-    }
-})
+module.exports = require('http').createServer(app)
+
+
 
 
