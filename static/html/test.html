@@ -28,14 +28,9 @@
   <img src="../svg/share2.svg" alt="">
   <img src="../svg/windows8.svg" alt="">
   <img src="../svg/cart.svg" alt=""> -->  
-  <!-- <script src="../js/test.js"></script> -->
+  <script src="../js/test.js"></script>
   <script src="../js/socket.io.js"></script>
   <script>
-    let socket = io.connect('http://localhost:7003')
-    socket.on('systeminfo', function (data) {
-      console.log(data)
-      socket.emit('custominfo', 'this is data from client')
-    })
   </script>
 </body>
 </html>
