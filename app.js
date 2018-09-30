@@ -54,7 +54,6 @@ app.all('/api/*', function (req, res, next) {
     res.header('Access-Control-Allow-Headers', 'x-Request-with')
     res.header('Access-Control-Allow-Credentials', true)
     res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
-    res.header('X-Powered-By', '4.15.2')
     res.header('Content-Type', 'application/json;charset=utf-8')
     next()
 })

@@ -4,6 +4,7 @@ let router = express.Router()
 let path = require('path')
 let http = require('http')
 let fs = require('fs')
+let multiparty = require('multiparty')
 let querystring = require('querystring')
 let request = require('request')
 let {SessionTable} = require('../models/model.js')
@@ -32,63 +33,61 @@ router.get('/admin', function (req, res) {
 })
 
 router.post('/v1', function (req, res) {
-    console.log(req.body)
-    var form = new multiparty.Form({ uploadDir: 'upload' })
-    form.encoding = 'utf-8'
-    form.maxFilesSize = 5 * 1024 * 1024
+    console.log('req.body', req.body)
+    var form = new multiparty.Form({ 
+        encoding: 'utf8',
+        maxFilesSize: 10 * 1024 * 1024,
+        autoFiles: true,
+        uploadDir: 'static/upload'
+    })
     form.parse(req, function (err, fields, files) {
-        // console.log(err)
-        // console.log('-----------')
-        // console.log(fields)
-        // console.log('-----------')
         console.log(files)
-        console.log('-----------')
-        var filesTmp = JSON.stringify(files, null, 2)
-        console.log('parse files: ' + filesTmp)
         if (err) {
             console.log('parse error: ' + err)
-        }
-        else {
-            let promiseArr = []
-            let uploadSrc = []
-            files.imgfile.forEach((item) => {
-                var inputFile = item
-                var uploadedPath = path.resolve(__dirname, '../', inputFile.path)
-                var dstPath = path.resolve(__dirname, '../upload/' + inputFile.originalFilename)
-                uploadSrc.push(dstPath)
-                //重命名为真实文件名
-                promiseArr.push(new Promise(function (resolve, reject) {
-                    fs.rename(uploadedPath, dstPath, function (err) {
-                        if (err) {
-                            console.log('rename error: ' + err)
-                            reject('failed')
-                        } else {
-                            console.log('rename ok')
-                            resolve('success')
-                        }
-                    })
-                }))
+            res.json({
+                code: 0,
+                message: 'multiparty解析失败'
             })
-            Promise.all(promiseArr).then(function (result) {
-                // console.log(result)
-                let urls = []
-                uploadSrc.forEach((item) => {
-                    urls.push(fs.readFileSync(item).toString('base64'))
-                })
-                // console.log(urls)
-                res.json({
-                    code: 1,
-                    message: '图片上传成功',
-                    urls: urls
-                })
-            }).catch(function (err) {
-                console.log(err)
-                res.json({
-                    code: 0,
-                    message: '图片上传失败'
-                })
-            })
+            return
         }
+        let promiseArr = []
+        let resSemiSrc = []
+        files.uploadfile.forEach((item) => {
+            var uploadedPath = path.resolve(__dirname, '../', item.path) // 经过multiparty处理的路径
+            var realPath = path.resolve(__dirname, '../static/upload/' + item.originalFilename) // 真实文件名产生的路径
+            resSemiSrc.push(path.resolve('/static/upload/' + item.originalFilename))// 返回前端一半的目标路径
+            // 重命名为真实文件名
+            promiseArr.push(new Promise(function (resolve, reject) {
+                fs.rename(uploadedPath, realPath, function (err) {
+                    if (err) {
+                        console.log('rename error: ' + err)
+                        reject('failed')
+                    } else {
+                        console.log('rename ok')
+                        resolve('success')
+                    }
+                })
+            }))
+        })
+        Promise.all(promiseArr).then(function (result) {
+            // console.log(result)
+            // let urls = []
+            // uploadSrc.forEach((item) => {
+            //     urls.push(fs.readFileSync(item).toString('base64'))
+            // })
+            res.json({
+                code: 1,
+                message: '图片上传成功',
+                imgurls: resSemiSrc
+            })
+        }).catch(function (err) {
+            console.log(err)
+            res.json({
+                code: 0,
+                message: '图片上传失败'
+            })
+        })
+        
     })
 })
 // router.get('/v2', function(req, res){
