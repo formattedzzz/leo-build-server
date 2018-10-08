@@ -22,14 +22,15 @@ router.get('/v3', function (req, res) {
     })
 })
 
-router.get('/admin', function (req, res) {
-    (async function (){
-        let result = await SessionTable.findAll({where: {openid: 'openid'}})
-        // console.log(result)  
-        res.json({
-            data: result
-        })
-    })()
+router.get('/admin', async function (req, res) {
+    let sessionid = req.headers['sessionid']
+    // (async function (){
+    let result = await SessionTable.findAll({where: {sessionid}})
+    // console.log(result)
+    res.json({
+        data: result
+    })
+    // })()
 })
 
 router.post('/v1', function (req, res) {

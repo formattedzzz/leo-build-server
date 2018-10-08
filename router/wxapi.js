@@ -31,7 +31,7 @@ router.get('/login', function (req, res) {
             if (session) {
                 // console.log('有记录')
                 let uuid = uuidv1()
-                SessionTable.update({session_key: session_key, uuid: uuid}, {where: {openid: openid} }).then(()=>{
+                SessionTable.update({session_key: session_key, sessionid: uuid}, {where: {openid: openid} }).then(()=>{
                     console.log('老用户sessionID更新成功！')
                     res.header('sessionID', uuid)
                     res.json({
