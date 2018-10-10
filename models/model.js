@@ -1,6 +1,7 @@
 let Sequelize = require('sequelize')
 let sequelize = require('../utils/sequelize.js')
 // conection.connect()
+// sessionid openid映射表
 const SessionTable = sequelize.define('session_table', {
   sessionid: {
     type: Sequelize.STRING
@@ -12,7 +13,33 @@ const SessionTable = sequelize.define('session_table', {
     type: Sequelize.STRING
   }
 });
-
+// 用户信息表
+const UserTable = sequelize.define('user_table', {
+  openid: {
+    type: Sequelize.STRING
+  },
+  nickname: {
+    type: Sequelize.STRING
+  },
+  gender: {
+    type: Sequelize.STRING
+  },
+  avatar: { 
+    type: Sequelize.STRING
+  },
+  country: {
+    type: Sequelize.STRING
+  },
+  province: {
+    type: Sequelize.STRING
+  },
+  city: {
+    type: Sequelize.STRING
+  },
+  add: {
+    type: Sequelize.STRING
+  }
+});
 // bbb()
 // SessionTable.findOne({where: {openid: 'openid'}}).then((res)=>{
 //   console.log(res.get('sessionid'))
@@ -58,6 +85,24 @@ const SessionTable = sequelize.define('session_table', {
 // .then((res)=>{
 //   console.log('inserted ok too!')
 // })
+
+SessionTable
+  .sync({ alter: true })
+  .then(() => {
+    console.log('SessionTable is already.')
+  })
+  .catch(err => {
+    console.error('Connection failed.', err)
+  })
+UserTable
+  .sync({ alter: true })
+  .then(() => {
+    console.log('UserTable is already.')
+  })
+  .catch(err => {
+    console.error('Connection failed.', err)
+  })
 module.exports = {
-  SessionTable
+  SessionTable,
+  UserTable
 }

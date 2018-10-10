@@ -3,7 +3,7 @@ let router = express.Router()
 let Axios = require('axios')
 let WXBizDataCrypt = require('../static/js/WXBizDataCrypt.js')
 let config = require('../config.js')
-let {SessionTable} = require('../models/model.js')
+let {SessionTable, UserTable} = require('../models/model.js')
 let uuidv1 = require('uuid/v1')
 router.get('/login', function (req, res) {
     // console.log(req.query)
@@ -26,7 +26,33 @@ router.get('/login', function (req, res) {
         let decodedata = pc.decryptData(encryptedData , iv)
         console.log(session_key, openid)
         // console.log('解密后用户信息: ', decodedata)
-        
+        let {nickName, gender, country, province, city, avatarUrl} = decodedata
+        UserTable.findOne({ where: {openid: openid} }).then((user) => {
+            if (user) {
+                UserTable.update({
+                    nickname: nickName,
+                    gender,
+                    country,
+                    province,
+                    city,
+                    avatar: avatarUrl
+                }, {where: {openid: openid} }).then(() => {
+                    console.log('老用户基本资料更新成功！')
+                })
+            } else {
+                UserTable.create({
+                    openid,
+                    nickname: nickName,
+                    gender,
+                    avatar: avatarUrl,
+                    country,
+                    province,
+                    city
+                }).then(() => {
+                    console.log('新用户基本资料注入成功！')
+                })
+            }
+        })
         SessionTable.findOne({ where: {openid: openid} }).then((session) => {
             if (session) {
                 // console.log('有记录')
