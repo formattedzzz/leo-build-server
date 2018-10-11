@@ -7,6 +7,7 @@ let fs = require('fs')
 let multiparty = require('multiparty')
 let querystring = require('querystring')
 let request = require('request')
+const asyncHandler = require('express-async-handler')
 let {SessionTable} = require('../models/model.js')
 
 router.get('/v3', function (req, res) {
@@ -22,7 +23,7 @@ router.get('/v3', function (req, res) {
     })
 })
 
-router.get('/admin', async function (req, res) {
+router.get('/admin', asyncHandler(async function (req, res) {
     let sessionid = req.headers['sessionid']
     // (async function (){
     let result = await SessionTable.findAll({where: {sessionid}})
@@ -31,7 +32,7 @@ router.get('/admin', async function (req, res) {
         data: result
     })
     // })()
-})
+}))
 
 router.post('/v1', function (req, res) {
     console.log('req.body', req.body)

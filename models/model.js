@@ -35,11 +35,81 @@ const UserTable = sequelize.define('user_table', {
   },
   city: {
     type: Sequelize.STRING
-  },
-  add: {
-    type: Sequelize.STRING
   }
 });
+// 记账记录总表
+/**
+ * @param account_id 记账记录ID
+ * @param openid 记账人openid
+ * @param account_income 1: 收入 0: 支出
+ * @param account_type 记账类型 T001: 约会
+ * @param account_fund 记账金额
+ * @param account_comment 记账备注
+ * @param account_time 记账时间
+ */
+const AccountTable = sequelize.define('account_table', {
+  account_id: {
+    type: Sequelize.STRING,
+    primaryKey: true
+  },
+  openid: {
+    type: Sequelize.STRING
+  },
+  account_income: {
+    type: Sequelize.INTEGER
+  },
+  account_type: {
+    type: Sequelize.STRING(4)
+  },
+  account_fund: {
+    type: Sequelize.BIGINT
+  },
+  account_comment: {
+    type: Sequelize.STRING
+  },
+  account_time: {
+    type: Sequelize.DATE
+  }
+});
+// 记账类型表
+/**
+ * @param type_id 类型ID
+ * @param type_desc 类型描述
+ * @param type_income 1: 收入 0: 支出
+ * @param type_icon 类型描述图标
+ */
+const AccountTypeTable = sequelize.define('account_type_table', {
+  type_id: {
+    type: Sequelize.STRING(4),
+    primaryKey: true
+  },
+  type_desc: {
+    type: Sequelize.STRING
+  },
+  type_income: {
+    type: Sequelize.INTEGER
+  },
+  type_icon: {
+    type: Sequelize.STRING
+  },
+});
+
+
+[SessionTable, UserTable, AccountTable, AccountTypeTable].forEach((item, index) => {
+  item.sync({ alter: true })
+  .then(() => {
+    console.log(`${item.tableName} is already.`)
+  })
+  .catch(err => {
+    console.error('Connection failed.', err)
+  })
+})
+module.exports = {
+  SessionTable,
+  UserTable,
+  AccountTable,
+  AccountTypeTable
+}
 // bbb()
 // SessionTable.findOne({where: {openid: 'openid'}}).then((res)=>{
 //   console.log(res.get('sessionid'))
@@ -85,24 +155,3 @@ const UserTable = sequelize.define('user_table', {
 // .then((res)=>{
 //   console.log('inserted ok too!')
 // })
-
-SessionTable
-  .sync({ alter: true })
-  .then(() => {
-    console.log('SessionTable is already.')
-  })
-  .catch(err => {
-    console.error('Connection failed.', err)
-  })
-UserTable
-  .sync({ alter: true })
-  .then(() => {
-    console.log('UserTable is already.')
-  })
-  .catch(err => {
-    console.error('Connection failed.', err)
-  })
-module.exports = {
-  SessionTable,
-  UserTable
-}

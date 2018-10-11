@@ -57,6 +57,13 @@ app.all('/api/*', function (req, res, next) {
     res.header('Content-Type', 'application/json;charset=utf-8')
     next()
 })
+app.use(function(err,req,res,next) {
+    console.log("Error happens",err.stack)
+    res.json({
+        code: 500,
+        message: '发现服务器错误'
+    })
+});
 
 let api = require('./router/api')
 let static = require('./router/static')
