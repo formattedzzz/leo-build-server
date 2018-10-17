@@ -1,3 +1,5 @@
 node_modules/
 test/
 upload/
+access.log
+.Ds_Store
