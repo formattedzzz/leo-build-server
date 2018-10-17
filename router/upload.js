@@ -32,6 +32,7 @@ router.get('*', function (req, res) {
     })
   }
 })
+// 视频文件暂时只支持单个上传
 router.post('/video', function (req, res) {
   var form = new multiparty.Form({
     encoding: 'utf8',
@@ -44,46 +45,22 @@ router.post('/video', function (req, res) {
       console.log('parse error: ' + err)
       res.json({
         code: 0,
-        message: 'multiparty解析失败'
+        message: '解析失败,极可能为upload路径不对！',
+        path: ''
       })
       return
     }
-    let promiseArr = []
-    let resSemiSrc = []
-    files.video.forEach((item) => {
-      var uploadedPath = path.resolve(__dirname, '../', item.path) // 经过multiparty处理的路径
-      var realPath = path.resolve(__dirname, '../upload/video/' + item.originalFilename) // 真实文件名产生的路径
-      resSemiSrc.push(path.resolve('/upload/video/' + item.originalFilename))// 返回前端一半的目标路径
-      // 重命名为真实文件名
-      promiseArr.push(new Promise(function (resolve, reject) {
-        fs.rename(uploadedPath, realPath, function (err) {
-          if (err) {
-            console.log('rename error: ' + err)
-            reject('failed')
-          } else {
-            console.log('rename ok')
-            resolve('success')
-          }
-        })
-      }))
-    })
-    Promise.all(promiseArr).then(function (result) {
-      res.json({
-        code: 1,
-        message: '视频上传成功',
-        imgurls: resSemiSrc
-      })
-    }).catch(function (err) {
-      console.log(err)
-      res.json({
-        code: 0,
-        message: '视频上传失败'
-      })
+    console.log(files)
+    // let multipartiedPath =  path.resolve(__dirname, '../', files.video[0].path)
+    res.json({
+      code: 1,
+      message: '视频上传成功',
+      path: '/' + files.video[0].path
     })
   })
 })
+
 router.post('/image', function (req, res) {
-  console.log('req.body', req.body)
   var form = new multiparty.Form({
     encoding: 'utf8',
     maxFilesSize: 10 * 1024 * 1024,
@@ -91,53 +68,57 @@ router.post('/image', function (req, res) {
     uploadDir: 'upload/image'
   })
   form.parse(req, function (err, fields, files) {
-    console.log(files)
     if (err) {
       console.log('parse error: ' + err)
       res.header``
       res.json({
         code: 0,
-        message: 'multiparty解析失败'
+        message: 'multiparty解析失败',
+        path: ''
       })
       return
     }
-    let promiseArr = []
-    let resSemiSrc = []
-    files.image.forEach((item) => {
-      var uploadedPath = path.resolve(__dirname, '../', item.path) // 经过multiparty处理的路径
-      var realPath = path.resolve(__dirname, '../upload/image/' + item.originalFilename) // 真实文件名产生的路径
-      resSemiSrc.push(path.resolve('/upload/image/' + item.originalFilename))// 返回前端一半的目标路径
-      // 重命名为真实文件名
-      promiseArr.push(new Promise(function (resolve, reject) {
-        fs.rename(uploadedPath, realPath, function (err) {
-          if (err) {
-            console.log('rename error: ' + err)
-            reject('failed')
-          } else {
-            console.log('rename ok')
-            resolve('success')
-          }
-        })
-      }))
+    let pathArr = files.image.map((item, index) => {
+      return '/' + item.path
     })
-    Promise.all(promiseArr).then(function (result) {
-      // console.log(result)
-      // let urls = []
-      // uploadSrc.forEach((item) => {
-      //     urls.push(fs.readFileSync(item).toString('base64'))
-      // })
-      res.json({
-        code: 1,
-        message: '图片上传成功',
-        imgurls: resSemiSrc
-      })
-    }).catch(function (err) {
-      console.log(err)
-      res.json({
-        code: 0,
-        message: '图片上传失败'
-      })
+    res.json({
+      code: 1,
+      message: '图片上传成功',
+      path: pathArr
     })
+    // let promiseArr = []
+    // let resSemiSrc = []
+    // files.image.forEach((item) => {
+    //   var uploadedPath = path.resolve(__dirname, '../', item.path) // 经过multiparty处理的路径
+    //   var realPath = path.resolve(__dirname, '../upload/image/' + item.originalFilename) // 真实文件名产生的路径
+    //   resSemiSrc.push(path.resolve('/upload/image/' + item.originalFilename))// 返回前端一半的目标路径
+    //   // 重命名为真实文件名
+    //   promiseArr.push(new Promise(function (resolve, reject) {
+    //     fs.rename(uploadedPath, realPath, function (err) {
+    //       if (err) {
+    //         console.log('rename error: ' + err)
+    //         reject('failed')
+    //       } else {
+    //         console.log('rename ok')
+    //         resolve('success')
+    //       }
+    //     })
+    //   }))
+    // })
+    // Promise.all(promiseArr).then(function (result) {
+    //   // fs.readFileSync(path).toString('base64') // 返回base64编码的图片
+    //   res.json({
+    //     code: 1,
+    //     message: '图片上传成功',
+    //     path: resSemiSrc
+    //   })
+    // }).catch(function (err) {
+    //   console.log(err)
+    //   res.json({
+    //     code: 0,
+    //     message: '图片上传失败'
+    //   })
+    // })
   })
 })
 
