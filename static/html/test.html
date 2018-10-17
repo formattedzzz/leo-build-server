@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,30 +8,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" media="screen" href="./style.css" />
   <style>
-  body{ height: 5000px; }
-  span{
-    font-size: 30px;
-  }
-  img{
-    width: 100px;
-    height: 100px;
-  }
+    body {
+      height: 5000px;
+    }
+
+    * {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    ul.box {
+      list-style: none;
+      width: 165px;
+      height: 165px;
+      padding: 30px;
+    }
+
+    .box li {
+      float: left;
+    }
+
+    .box a {
+      display: block;
+      width: 50px;
+      height: 50px;
+      border: 5px solid blue;
+      margin-left: -5px;
+      margin-top: -5px;
+    }
+
+    .box a:hover {
+      position: relative;
+      border-color: red;
+      z-index: 100;
+    }
+
+    .box:after {
+      content: "";
+      height: 0;
+      visibility: hidden;
+      clear: both;
+      display: block;
+    }
   </style>
 
 </head>
+
 <body>
-  <span class="icon-pen"></span><span>这是字体图片</span>
+  <div id="wrap">
+    <ul class="box">
+      <li><a href=""></a></li>
+      <li><a href=""></a></li>
+      <li><a href=""></a></li>
+      <li><a href=""></a></li>
+      <li><a href=""></a></li>
+      <li><a href=""></a></li>
+      <li><a href=""></a></li>
+      <li><a href=""></a></li>
+      <li><a href=""></a></li>
+    </ul>
+  </div>
+  <!-- <span class="icon-pen"></span><span>这是字体图片</span>
   <span class="icon-windows8"></span><span>这是字体图片</span>
   <span class="icon-share2"></span><span>这是字体图片</span>
   <span class="icon-cart"></span><span>这是字体图片</span>
-  <span class="icon-bullhorn"></span><span>这是字体图片</span>
+  <span class="icon-bullhorn"></span><span>这是字体图片</span> -->
   <!-- <img src="../svg/pen.svg" alt="">
   <img src="../svg/share2.svg" alt="">
   <img src="../svg/windows8.svg" alt="">
-  <img src="../svg/cart.svg" alt=""> -->  
-  <script src="../js/test.js"></script>
-  <script src="../js/socket.io.js"></script>
+  <img src="../svg/cart.svg" alt=""> -->
+  <!-- <script src="../js/test.js"></script>
+  <script src="../js/socket.io.js"></script> -->
   <script>
   </script>
 </body>
+
 </html>

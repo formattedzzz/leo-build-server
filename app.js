@@ -63,16 +63,19 @@ app.use(function(err,req,res,next) {
         code: 500,
         message: '发现服务器错误'
     })
+    next(err)
 });
 
 let api = require('./router/api')
 let static = require('./router/static')
 let wxapi = require('./router/wxapi')
 let views = require('./router/views')
+let test = require('./router/test')
 app.use('/api', api)
 app.use('/static', static)
 app.use('/wx', wxapi)
 app.use('/views', views)
+app.use('/test', test)
 
 module.exports = require('http').createServer(app)
 
