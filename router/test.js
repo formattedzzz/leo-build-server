@@ -6,7 +6,7 @@ let multiparty = require('multiparty')
 
 router.get('*', function (req, res) {
   let pathurl = req.path
-  let url = path.resolve(__dirname, '../test' + pathurl)
+  let url = path.resolve(__dirname, '../upload' + pathurl)
   // let type = /\.(\w+)$/.exec(pathurl) ? /\.(\w+)$/.exec(pathurl)[1] : ''
   /** ---------------播放链接 */
   res.set('Content-Type', 'video/mp4;charset=utf-8')

@@ -75,7 +75,7 @@ app.use('/api', api)
 app.use('/static', static)
 app.use('/wx', wxapi)
 app.use('/views', views)
-app.use('/test', test)
+app.use('/upload', test)
 
 module.exports = require('http').createServer(app)
 
