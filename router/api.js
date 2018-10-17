@@ -37,78 +37,7 @@ router.get('/admin', asyncHandler(async function (req, res) {
     // })()
 }))
 
-router.post('/v1', function (req, res) {
-    console.log('req.body', req.body)
-    var form = new multiparty.Form({ 
-        encoding: 'utf8',
-        maxFilesSize: 10 * 1024 * 1024,
-        autoFiles: true,
-        uploadDir: 'static/upload'
-    })
-    form.parse(req, function (err, fields, files) {
-        console.log(files)
-        if (err) {
-            console.log('parse error: ' + err)
-            res.json({
-                code: 0,
-                message: 'multiparty解析失败'
-            })
-            return
-        }
-        let promiseArr = []
-        let resSemiSrc = []
-        files.uploadfile.forEach((item) => {
-            var uploadedPath = path.resolve(__dirname, '../', item.path) // 经过multiparty处理的路径
-            var realPath = path.resolve(__dirname, '../static/upload/' + item.originalFilename) // 真实文件名产生的路径
-            resSemiSrc.push(path.resolve('/static/upload/' + item.originalFilename))// 返回前端一半的目标路径
-            // 重命名为真实文件名
-            promiseArr.push(new Promise(function (resolve, reject) {
-                fs.rename(uploadedPath, realPath, function (err) {
-                    if (err) {
-                        console.log('rename error: ' + err)
-                        reject('failed')
-                    } else {
-                        console.log('rename ok')
-                        resolve('success')
-                    }
-                })
-            }))
-        })
-        Promise.all(promiseArr).then(function (result) {
-            // console.log(result)
-            // let urls = []
-            // uploadSrc.forEach((item) => {
-            //     urls.push(fs.readFileSync(item).toString('base64'))
-            // })
-            res.json({
-                code: 1,
-                message: '图片上传成功',
-                imgurls: resSemiSrc
-            })
-        }).catch(function (err) {
-            console.log(err)
-            res.json({
-                code: 0,
-                message: '图片上传失败'
-            })
-        })
-        
-    })
-})
-// router.get('/v2', function(req, res){
-
-//     let sql = 'SELECT * FROM USERINFO'
-
-//     conection.query(sql, function(err, result){
-//         if (err) {
-//             console.log(err)
-//         } else {
-//             res.send(result)
-//         }
-//     })
-// })
 function httpGet(host, data, path, status) {
-    console.log('===================HttpGet=====================')
     let options = {
         host: host,
         port: 80,
