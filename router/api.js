@@ -29,7 +29,10 @@ router.get('/admin', asyncHandler(async function (req, res) {
     let result = await SessionTable.findAll({where: {sessionid}})
     // console.log(result)
     res.json({
-        data: result
+        data: {
+            name: 'xiaolin',
+            age: 22
+        }
     })
     // })()
 }))
