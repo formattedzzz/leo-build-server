@@ -9,13 +9,43 @@ router.get('*', function (req, res) {
   let url = path.resolve(__dirname, '../upload' + pathurl)
   let type = /\.(\w+)$/.exec(pathurl) ? /\.(\w+)$/.exec(pathurl)[1] : ''
   if (type === 'mp4') {
-    res.set('Content-Type', 'video/mp4;charset=utf-8')
-    var rs = fs.createReadStream(url)
-    rs.pipe(res)
-    rs.on('end', function () {
-      res.end()
-      console.log('end call')
-    })
+    // res.set('Content-Type', 'video/mp4;charset=utf-8')
+    // var rs = fs.createReadStream(url)
+    // rs.pipe(res)
+    // rs.on('end', function () {
+    //   res.end()
+    //   console.log('end call')
+    // })
+    const path = url
+    const stat = fs.statSync(path)
+    const fileSize = stat.size
+    const range = req.headers.range
+    if (range) {
+      const parts = range.replace(/bytes=/, "").split("-")
+      const start = parseInt(parts[0], 10)
+      const end = parts[1]
+        ? parseInt(parts[1], 10)
+        : fileSize-1
+  
+      const chunksize = (end-start)+1
+      const file = fs.createReadStream(path, {start, end})
+      const head = {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': 'video/mp4',
+      }
+  
+      res.writeHead(206, head)
+      file.pipe(res)
+    } else {
+      const head = {
+        'Content-Length': fileSize,
+        'Content-Type': 'video/mp4',
+      }
+      res.writeHead(200, head)
+      fs.createReadStream(path).pipe(res)
+    }
   } else {
     let url = path.resolve(__dirname, '../upload' + pathurl)
     fs.readFile(url, function (err, data) {
@@ -45,12 +75,11 @@ router.post('/video', function (req, res) {
       console.log('parse error: ' + err)
       res.json({
         code: 0,
-        message: '解析失败,极可能为upload路径不对！',
+        message: '解析失败,可能为upload路径不对！',
         path: ''
       })
       return
     }
-    console.log(files)
     // let multipartiedPath =  path.resolve(__dirname, '../', files.video[0].path)
     res.json({
       code: 1,
@@ -61,6 +90,9 @@ router.post('/video', function (req, res) {
 })
 
 router.post('/image', function (req, res) {
+  console.log(Object.keys(req))
+  let {rawHeaders, body, params, headers } = req
+  console.log(rawHeaders, body, params, headers )
   var form = new multiparty.Form({
     encoding: 'utf8',
     maxFilesSize: 10 * 1024 * 1024,
@@ -70,14 +102,24 @@ router.post('/image', function (req, res) {
   form.parse(req, function (err, fields, files) {
     if (err) {
       console.log('parse error: ' + err)
-      res.header``
       res.json({
         code: 0,
-        message: 'multiparty解析失败',
+        message: '解析失败，可能为upload路径不对！',
         path: ''
       })
       return
     }
+    // files 数据格式：
+    // {
+    //   fieldName: 'image',
+    //   originalFilename: 'temppath...',
+    //   path: 'upload/image/...',
+    //   Headers: {
+    //     'content-type': 'image/type',
+    //     'content-disposition': 'form-data; name="image";filename="..."'
+    //   },
+    //   size: 31034524
+    // }
     let pathArr = files.image.map((item, index) => {
       return '/' + item.path
     })
@@ -86,6 +128,11 @@ router.post('/image', function (req, res) {
       message: '图片上传成功',
       path: pathArr
     })
+
+  })
+})
+
+module.exports = router    
     // let promiseArr = []
     // let resSemiSrc = []
     // files.image.forEach((item) => {
@@ -119,7 +166,3 @@ router.post('/image', function (req, res) {
     //     message: '图片上传失败'
     //   })
     // })
-  })
-})
-
-module.exports = router

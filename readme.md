@@ -1,9 +1,11 @@
 - models 数据库表模型
 - router 模块路由
 - static 静态资源，支持直接访问
+- upload 上传文件夹 不托管到git 需要手动新建再在其下建立image和video文件夹
 - utils 连接库 工具
 - views 模板文件
-- access.log api路由访问日志
+- access.log api路由访问日志 不托管到git
+- nodemon.json nodemon启动配置项
 - app.js 
 - start.js 启动入口 + socket代码
 - config.js 配置文件

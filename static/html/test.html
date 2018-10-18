@@ -11,74 +11,102 @@
     body {
       height: 5000px;
     }
-
-    * {
-      margin: 0px;
-      padding: 0px;
+    * { margin: 0px;padding: 0px; }
+    /* -------------------------- */
+    .box{
+      width: 280px;
+      height: 280px;
+      margin: 100px auto 0;
+      overflow: hidden;
+      border-left: #f66;
+      border-top: #f66;
+      box-sizing: border-box;
+      padding: 10px 0 0 10px;
     }
-
-    ul.box {
-      list-style: none;
-      width: 165px;
-      height: 165px;
-      padding: 30px;
-    }
-
-    .box li {
+    .box div{
+      width: 100px;
+      height: 100px;
+      box-sizing: border-box;
+      border: 10px solid #ccc;
+      overflow: hidden;
       float: left;
-    }
-
-    .box a {
-      display: block;
-      width: 50px;
-      height: 50px;
-      border: 5px solid blue;
-      margin-left: -5px;
-      margin-top: -5px;
-    }
-
-    .box a:hover {
+      margin-left: -10px;
+      margin-top: -10px;
+      z-index: 1;
       position: relative;
-      border-color: red;
-      z-index: 100;
+      transition: all 0.3s ease-out;
     }
-
-    .box:after {
-      content: "";
-      height: 0;
-      visibility: hidden;
-      clear: both;
-      display: block;
+    .box div:hover{
+      z-index: 9;
+      border-color: #0c0;
     }
+    /* -------------------------- */
+  html,
+  body {
+    height: 100vh;
+    width: 100vw;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: "Open Sans","PingFang SC","Microsoft YaHei","Helvetica Neue","Hiragino Sans GB","WenQuanYi Micro Hei",Arial,sans-serif;
+  }
+  @keyframes move {
+    0% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 100% 0;
+    }
+  }
+  .bg {
+    background: url(https://sp-webfront.skypixel.com/skypixel/v2/public/website/assets/1535027674204-f6eca6369ec03e70262b58b0e25cda7b.jpg);
+    background-size: cover;
+    position: fixed;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    filter: blur(10px);
+    z-index: -1;
+  }
+  .slogan {
+    color: white;
+    margin-top: 24px;
+    font-size: 36px;
+    font-weight: 400;
+  }
+  .mask {
+    width: 340px;
+    height: 196px;
+    animation: move 40s infinite;
+    background-image: url(https://sp-webfront.skypixel.com/skypixel/v2/public/website/assets/1535027674204-f6eca6369ec03e70262b58b0e25cda7b.jpg);
+    background-size: cover;
+    -webkit-mask: url(http://static.w3ctrain.com/upload_cae6fcb079f57792a47202cb67bbc04a-dji-seeklogo.com.svg);
+    -webkit-mask-size: cover;
+  }
   </style>
-
 </head>
 
 <body>
-  <div id="wrap">
-    <ul class="box">
-      <li><a href=""></a></li>
-      <li><a href=""></a></li>
-      <li><a href=""></a></li>
-      <li><a href=""></a></li>
-      <li><a href=""></a></li>
-      <li><a href=""></a></li>
-      <li><a href=""></a></li>
-      <li><a href=""></a></li>
-      <li><a href=""></a></li>
-    </ul>
-  </div>
-  <!-- <span class="icon-pen"></span><span>这是字体图片</span>
-  <span class="icon-windows8"></span><span>这是字体图片</span>
-  <span class="icon-share2"></span><span>这是字体图片</span>
-  <span class="icon-cart"></span><span>这是字体图片</span>
-  <span class="icon-bullhorn"></span><span>这是字体图片</span> -->
-  <!-- <img src="../svg/pen.svg" alt="">
-  <img src="../svg/share2.svg" alt="">
-  <img src="../svg/windows8.svg" alt="">
-  <img src="../svg/cart.svg" alt=""> -->
-  <!-- <script src="../js/test.js"></script>
-  <script src="../js/socket.io.js"></script> -->
+  <!-- <div id="wrap">
+    <div class="box">
+      <div><a href=""></a></div>
+      <div><a href=""></a></div>
+      <div><a href=""></a></div>
+      <div><a href=""></a></div>
+      <div><a href=""></a></div>
+      <div><a href=""></a></div>
+      <div><a href=""></a></div>
+      <div><a href=""></a></div>
+      <div><a href=""></a></div>
+    </div>
+  </div> -->
+  <div class="bg"></div>
+  <div class="mask"></div>
+  <h1 class="slogan">你看世界是什么角度</h1>
   <script>
   </script>
 </body>
