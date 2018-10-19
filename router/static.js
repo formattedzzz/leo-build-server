@@ -51,9 +51,9 @@ router.get('*', function (req, res) {
   fs.readFile(url, function (err, data) {
     if (err) {
       res.header('Content-Type', 'application/json;charset=utf-8')
-      res.json({
+      res.status(404).json({
         code: 0,
-        message: '没有找到相应资源，请检查路径'
+        message: '404!没有找到相应资源，请检查路径'
       })
     } else {
       // console.log(data)

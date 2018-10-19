@@ -5,5 +5,6 @@ module.exports = {
     secret: 'ed69bd6509b8fe98312ada51cbb55047',
     host: 'localhost',
     password: 'lfl730811',
-    database: 'account'
+    database: 'account',
+    secret_key: 'leooo'
 }

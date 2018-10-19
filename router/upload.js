@@ -9,13 +9,6 @@ router.get('*', function (req, res) {
   let url = path.resolve(__dirname, '../upload' + pathurl)
   let type = /\.(\w+)$/.exec(pathurl) ? /\.(\w+)$/.exec(pathurl)[1] : ''
   if (type === 'mp4') {
-    // res.set('Content-Type', 'video/mp4;charset=utf-8')
-    // var rs = fs.createReadStream(url)
-    // rs.pipe(res)
-    // rs.on('end', function () {
-    //   res.end()
-    //   console.log('end call')
-    // })
     const path = url
     const stat = fs.statSync(path)
     const fileSize = stat.size
@@ -51,9 +44,9 @@ router.get('*', function (req, res) {
     fs.readFile(url, function (err, data) {
       if (err) {
         res.header('Content-Type', 'application/json;charset=utf-8')
-        res.json({
+        res.status(404).json({
           code: 0,
-          message: '没有找到相应资源，请检查路径'
+          message: '404!没有找到相应资源，请检查路径'
         })
       } else {
         res.set('Content-Type', `image/${type};charset=utf-8`)
@@ -73,7 +66,7 @@ router.post('/video', function (req, res) {
   form.parse(req, function (err, fields, files) {
     if (err) {
       console.log('parse error: ' + err)
-      res.json({
+      res.status(500).json({
         code: 0,
         message: '解析失败,可能为upload路径不对！',
         path: ''
@@ -90,9 +83,8 @@ router.post('/video', function (req, res) {
 })
 
 router.post('/image', function (req, res) {
-  console.log(Object.keys(req))
-  let {rawHeaders, body, params, headers } = req
-  console.log(rawHeaders, body, params, headers )
+  // console.log(Object.keys(req))
+  // let {rawHeaders, body, params, headers } = req
   var form = new multiparty.Form({
     encoding: 'utf8',
     maxFilesSize: 10 * 1024 * 1024,
@@ -102,13 +94,21 @@ router.post('/image', function (req, res) {
   form.parse(req, function (err, fields, files) {
     if (err) {
       console.log('parse error: ' + err)
-      res.json({
+      res.status(500).json({
         code: 0,
         message: '解析失败，可能为upload路径不对！',
         path: ''
       })
       return
     }
+    if (files.image[0].size === 0) {
+      res.status(400).json({
+        code: 0,
+        message: '上传为空！'
+      })
+      return
+    }
+    // console.log(files)
     // files 数据格式：
     // {
     //   fieldName: 'image',

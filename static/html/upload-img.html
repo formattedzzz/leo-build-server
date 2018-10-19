@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Upload Img</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+  <script src="main.js"></script> -->
+</head>
+
+<body>
+  <form id="formid" action="http://localhost:7003/upload/image" enctype="multipart/form-data" method="post">
+    <input class="img-input" name="image" accept="image/png, image/jpeg, image/gif" type="file" multiple/>
+    <input name="nickname" type="text">
+    <input name="age" type="text">
+    <button type="submit" id="submit">表单上传文件</button>
+  </form>
+  <button class="upload">JQFormData上传</button>
+  <!-- <div style="height: 100px;"></div> -->
+  <!-- <form id="formid2" action="http://localhost:7003/upload/image" enctype="application/x-www-form-urlencoded" method="post">
+    <input name="nickname" type="text">
+    <input name="age" type="text">
+    <button type="submit" id="submit">表单上传数据</button>
+  </form> -->
+  
+  <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+  <script>
+    $(function () {
+      $('.upload').click(uploadForm)
+      $('.img-input').change(readImgFiles)
+      var postdata = new FormData();
+      function readImgFiles() {
+        console.log(this.files)
+      }
+      function uploadForm() {
+        let postdata = new FormData($('#formid')[0])
+        console.log(postdata) // 打印出来看不到
+        $.ajax({
+          url: 'http://localhost:7003/upload/image',
+          type: 'POST',
+          cache: false,
+          data: postdata,
+          processData: false,
+          contentType: false
+        }).done(function (res) {
+          console.log(res)
+        }).fail(function (res) {
+          console.log(res)
+        })
+      }
+      function readImgFiles1() {
+        fd = new FormData();
+        var iLen = this.files.length;
+        console.log(this.files)
+        var index = 0;
+        for (var i = 0; i < iLen; i++) {
+          if (!oInput['value'].match(/.jpg|.gif|.png|.jpeg|.bmp/i)) {
+            return alert("上传的图片格式不正确，请重新选择");
+          }
+          var reader = new FileReader();
+          reader.index = i;
+          fd.append(i, this.files[i]);
+          reader.readAsDataURL(this.files[i]);
+          reader.fileName = this.files[i].name;
+          reader.onload = function (e) {
+            var imgMsg = {
+              name: this.fileName,
+              base64: this.result
+            }
+            dataArr.push(imgMsg);
+            result = `<div class="delete">delete</div><div class="result"><img src="${this.result}" alt=""/></div>`;
+            var imgcon = document.createElement('div');
+            imgcon.innerHTML = result;
+            imgcon['className'] = 'float';
+            imgcon['index'] = index;
+            document.getElementsByTagName('body')[0].appendChild(imgcon);
+            var img = imgcon.getElementsByTagName('img')[0];
+            img.onload = function () {
+              var nowHeight = ReSizePic(this);
+              this.parentNode.style.display = 'block';
+              var oParent = this.parentNode;
+              if (nowHeight) {
+                oParent.style.paddingTop = (oParent.offsetHeight - nowHeight) / 2 + 'px';
+              }
+            }
+            imgcon.onclick = function () {
+              this.remove();
+              delete dataArr[this.index];
+            }
+            index++;
+          }
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

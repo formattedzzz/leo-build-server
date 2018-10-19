@@ -8,7 +8,7 @@ let SessionStore = require('express-mysql-session')
 // let history = require('connect-history-api-fallback')
 let morgan = require('morgan')
 let app = express()
-let { host, password, database } = require('./config')
+let { host, password, database, secret_key} = require('./config')
 let accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 let morganStr = ':remote-addr - :remote-user [:date[clf]] :response-time ms ":method  :url HTTP/:http-version" :status :res[content-length] ":referrer"'
 let mysqlOptions = {
@@ -23,6 +23,7 @@ let mysqlOptions = {
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
+app.set('secret_key', secret_key)
 app.use(morgan(morganStr, { stream: accessLogStream }))
 app.use(express.static(path.join(__dirname, 'static')))
 app.use(bodyParser.raw({ type: 'application/vnd.custom-type' }))
@@ -60,8 +61,8 @@ app.all('/api/*', function (req, res, next) {
 })
 app.use(function(err,req,res,next) {
     console.log("Error happens",err.stack)
-    res.json({
-        code: 500,
+    res.status(500).json({
+        code: 0,
         message: '发现服务器错误'
     })
     next(err)
