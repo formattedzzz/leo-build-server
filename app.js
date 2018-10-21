@@ -1,13 +1,15 @@
-let path = require('path')
+
 let fs = require('fs')
+let path = require('path')
 let express = require('express')
 let bodyParser = require('body-parser')
 let cookieParser = require('cookie-parser')
 let session = require('express-session')
 let SessionStore = require('express-mysql-session')
+let asyncHandler = require('express-async-handler')
+let {SessionTable} = require('./models/model.js')
 // let history = require('connect-history-api-fallback')
 let morgan = require('morgan')
-let app = express()
 let { host, password, database, secret_key} = require('./config')
 let accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 let morganStr = ':remote-addr - :remote-user [:date[clf]] :response-time ms ":method  :url HTTP/:http-version" :status :res[content-length] ":referrer"'
@@ -18,6 +20,7 @@ let mysqlOptions = {
     password,
     database
 }
+let app = express()
 // let totalServer = require('http').createServer(app)
 // let IO = require('socket.io')(totalServer)
 
@@ -26,7 +29,6 @@ app.set('view engine', 'jade')
 app.set('secret_key', secret_key)
 app.use(morgan(morganStr, { stream: accessLogStream }))
 app.use(express.static(path.join(__dirname, 'static')))
-app.use(bodyParser.raw({ type: 'application/vnd.custom-type' }))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cookieParser())
@@ -51,14 +53,20 @@ app.use(session({
 //         res.end('welcome to the session demo. refresh!')
 //     }
 // })
-app.all('/api/*', function (req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header('Access-Control-Allow-Headers', 'x-Request-with')
-    res.header('Access-Control-Allow-Credentials', true)
-    res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
-    res.header('Content-Type', 'application/json;charset=utf-8')
-    next()
-})
+// 业务路由获取openid及解决跨域问题中间件
+app.all('/api/*',asyncHandler(async function (req, res, next) {
+        let sessionid = req.headers['sessionid']
+        let result = await SessionTable.findOne({where: {sessionid}})
+        req.openid = result.openid
+        res.header('Access-Control-Allow-Origin', '*')
+        res.header('Access-Control-Allow-Headers', 'x-Request-with')
+        res.header('Access-Control-Allow-Credentials', true)
+        res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
+        res.header('Content-Type', 'application/json;charset=utf-8')
+        next()
+    }) 
+)
+// 错误捕获中间件
 app.use(function(err,req,res,next) {
     console.log("Error happens",err.stack)
     res.status(500).json({

@@ -6,7 +6,7 @@ let querystring = require('querystring')
 let request = require('request')
 let JWT = require('jsonwebtoken')
 let asyncHandler = require('express-async-handler')
-let {SessionTable} = require('../models/model.js')
+// let {SessionTable} = require('../models/model.js')
 let {secret_key} = require('../config')
 // let conection = require('../utils/mysql')
 // let fs = require('fs')
@@ -35,9 +35,9 @@ router.get('/v2', function (req, res) {
 // JWT试验路由 小程序在登录后拿到opened和session_key后下发token 再写一个router.use()中间件
 // if token将解密后的openeid 挂载到req下 next() 否则res.status(403).json({}) 
 router.get('/admin', asyncHandler(async function (req, res) {
-    let sessionid = req.headers['sessionid']
-    let result = await SessionTable.findAll({where: {sessionid}})
-    // console.log(result)
+    // let sessionid = req.headers['sessionid']
+    // let result = await SessionTable.findAll({where: {sessionid}})
+    console.log(req.openid)
     const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoieGlhb2xpbiIsInVuaW9uaWQiOiJsZW8xMjEzOCIsImlhdCI6MTUzOTkyOTQ5NH0.yVmc74Ksj3VW620NbrWPqxdFDkFA606sVtJSUOb9cmA'
     if (req.header['jwt-token'] !== undefined || token) {
         JWT.verify(token, secret_key, function(err, decoded) {
