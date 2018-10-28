@@ -74,10 +74,12 @@ router.post('/video', function (req, res) {
       return
     }
     // let multipartiedPath =  path.resolve(__dirname, '../', files.video[0].path)
+    let respath = files.video[0].path.replace(/\\/g, '/')
+    console.log(files.video[0].path)
     res.json({
       code: 1,
       message: '视频上传成功',
-      path: '/' + files.video[0].path
+      path: '/' + respath
     })
   })
 })
@@ -120,8 +122,9 @@ router.post('/image', function (req, res) {
     //   },
     //   size: 31034524
     // }
+    console.log(files)
     let pathArr = files.image.map((item, index) => {
-      return '/' + item.path
+      return '/' + item.path.replace(/\\/g, '/')
     })
     res.json({
       code: 1,
