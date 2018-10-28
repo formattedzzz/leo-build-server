@@ -56,8 +56,10 @@ app.use(session({
 // 业务路由获取openid及解决跨域问题中间件
 app.all('/api/*',asyncHandler(async function (req, res, next) {
         let sessionid = req.headers['sessionid']
-        let result = await SessionTable.findOne({where: {sessionid}})
-        req.openid = result.openid
+        if (sessionid) {
+            let result = await SessionTable.findOne({where: {sessionid}})
+            req.openid = result.openid
+        }
         res.header('Access-Control-Allow-Origin', '*')
         res.header('Access-Control-Allow-Headers', 'x-Request-with')
         res.header('Access-Control-Allow-Credentials', true)
