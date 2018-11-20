@@ -1,5 +1,7 @@
+
 const Sequelize = require('sequelize')
-const sequelize = new Sequelize('account', 'root', 'lfl730811', {
+
+const sequelize = new Sequelize('account', 'root', require('../config.js').password, {
   host: 'localhost',
   dialect: 'mysql',
   pool: {

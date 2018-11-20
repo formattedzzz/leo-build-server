@@ -53,12 +53,24 @@ app.use(session({
 //         res.end('welcome to the session demo. refresh!')
 //     }
 // })
+
 // 业务路由获取openid及解决跨域问题中间件
-app.all('/api/*',asyncHandler(async function (req, res, next) {
+app.all('/api/*', asyncHandler(async function (req, res, next) {
         let sessionid = req.headers['sessionid']
         if (sessionid) {
             let result = await SessionTable.findOne({where: {sessionid}})
-            req.openid = result.openid
+            // console.log(result)
+            if (result && result.openid) {
+                req.openid = result.openid
+            } else {
+                req.openid = ''
+                res.status(401).json({
+                    code: -1,
+                    message: '获取不到用户opened，请重新登录'
+                })
+                // 业务api拿不到openid的时候中间件可以return掉 没有必要再走下去了
+                return
+            }
         }
         res.header('Access-Control-Allow-Origin', '*')
         res.header('Access-Control-Allow-Headers', 'x-Request-with')
@@ -66,9 +78,9 @@ app.all('/api/*',asyncHandler(async function (req, res, next) {
         res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
         res.header('Content-Type', 'application/json;charset=utf-8')
         next()
-    }) 
+    })
 )
-// 错误捕获中间件
+// 错误捕获中间件 这里捕获的不是逻辑上会走的错误，而是代码语法上的错误 比如说 var arr = null 而你在代码中访问了arr.length
 app.use(function(err,req,res,next) {
     console.log("Error happens",err.stack)
     res.status(500).json({

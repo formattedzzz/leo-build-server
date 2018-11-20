@@ -4,7 +4,7 @@ module.exports = {
     appid: 'wxb44a677abfabfc2c',
     secret: 'ed69bd6509b8fe98312ada51cbb55047',
     host: 'localhost',
-    password: 'lfl730811',
+    password: '1q2w3e4r5t',
     database: 'account',
     secret_key: 'leooo'
 }

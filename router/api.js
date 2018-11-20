@@ -37,7 +37,7 @@ router.get('/v2', function (req, res) {
 router.get('/admin', asyncHandler(async function (req, res) {
     // let sessionid = req.headers['sessionid']
     // let result = await SessionTable.findAll({where: {sessionid}})
-    console.log(req.openid)
+    console.log(req.openid, '-----------')
     const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoieGlhb2xpbiIsInVuaW9uaWQiOiJsZW8xMjEzOCIsImlhdCI6MTUzOTkyOTQ5NH0.yVmc74Ksj3VW620NbrWPqxdFDkFA606sVtJSUOb9cmA'
     if (req.header['jwt-token'] !== undefined || token) {
         JWT.verify(token, secret_key, function(err, decoded) {

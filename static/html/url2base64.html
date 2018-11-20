@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+  <script src="main.js"></script> -->
+</head>
+
+<body>
+  <!-- <canvas width="500" height="500" id="img-canvas"></canvas> -->
+  <!-- <img src="../img/full1.jpg" style="-webkit-user-select: none;width: 300px;height: 300px;"> -->
+  <script src="../js/jquery-2.0.js"></script>
+  <script>
+    $(function () {
+      var imgurl = 'https://wx.qlogo.cn/mmopen/vi_32/3jTeyaBpFdatch4Anhu3gJj8CwHVQMibq1eibuyV3hDxicAs8Hl5c5XnFBhOvUZQd1vAx9g68gXTo1IrylrayXiciag/132'
+      // var imgurl = 'https://wx.nnleo.cn/static/img/full1.jpg?timeStamp=' + new Date()
+      // ---------------------------------- 如果图片请求头中有crossOrigin属性可采用这个方法避免跨域（不一定有用）
+      function getBase64(url, cb) {
+        var Img = new Image(),
+          dataURL = '';
+        Img.setAttribute("crossOrigin", 'Anonymous');
+        Img.src = url;
+        Img.onload = function () {
+          var canvas = document.createElement("canvas"),
+            width = this.width,
+            height = this.height;
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext("2d").drawImage(Img, 0, 0, width, height);
+          dataURL = canvas.toDataURL('image/png');
+          cb && cb(dataURL)
+        };
+      }
+      // getBase64(imgurl, (data) => {
+      //   console.log(data)
+      // })
+      // ---------------------------------- 通过原生ajax发起请求要求返回blob流 通过URL.createObjectURL(blob)得到blob url
+      // ---------------------------------- blob url可以直接赋给img src 或者通过FileReader 读取为base64
+      function blobURL2base64(blob) {
+        let reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onload = function (e) {
+          console.log(e.loaded, '----------', this.result);
+        }
+      }
+      function getImageBlob(url) {
+        return new Promise((resolve, reject) => {
+          // var Img = new Image();
+          // Img.setAttribute('crossOrigin', 'Anonymous');
+          var xhr = new XMLHttpRequest();
+          xhr.open('get', url, true);
+          xhr.responseType = 'blob';
+          xhr.send();
+          xhr.onload = function (e) {
+            // console.log(e, '------', this.response)
+            if (this.status == 200) {
+              var src = URL.createObjectURL(this.response); //返回值blob URL
+              var blob = this.response
+              resolve({
+                src: src,
+                blob: blob
+              })
+            } else {
+              reject({
+                src: '',
+                blob: new Blob()
+              })
+            }
+          };
+        })
+      }
+      getImageBlob(imgurl).then((data) => {
+        console.log(data)
+        blobURL2base64(data.blob)
+      })
+    })
+  </script>
+
+</body>
+
+</html>

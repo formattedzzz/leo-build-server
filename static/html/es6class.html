@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+  <script src="main.js"></script>
+</head> -->
+<body>
+<script>
+window.onload = function () {
+  class Person {
+    // job = 'programmer'; //实例属性的等式写法 这样写会报错啊？
+    // static job = 'programmer';  // 也不行
+    constructor (opt) {
+      let opt_orign = {
+        name: 'xiaolin',
+        age: 22
+      }
+      this.opt = Object.assign({}, opt_orign, opt)
+      for (let key in this.opt) {
+        this[key] = this.opt[key]
+      }
+      this.consoleName = function () {
+        console.log(this.opt)
+      }.bind(this)
+      // return {} //构造函数里可以随意修改返回值 默认返回的是this实例
+    }
+    printInfo () {
+      console.log(this.name + this.age)
+    }
+    calcAge () {
+      return this.age > 18 ? 'old' : 'young'
+    }
+    static getTime () { // 类的静态方法 通过 Person.getTime 获取(类中类外均可)
+      return +new Date()
+    } 
+  }
+  var person1 = new Person({
+    name: 'leooo',
+    age: 18
+  })
+  // console.log(Object.keys(person1)) // 只能枚举挂在实例下的属性及方法
+
+  // console.log(Object.keys(Person))  // 不能枚举其内部方法 包括不可继承的static方法
+
+  // let consoleName = person1.consoleName // 实例下的方法单独提出来用要注意this指向 要么bind 要么箭头
+  // consoleName()
+
+  console.log(person1.calcAge())
+
+  // console.log(person1.job)
+  
+}
+</script>
+</body>
+</html>
