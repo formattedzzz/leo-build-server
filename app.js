@@ -8,6 +8,7 @@ let session = require('express-session')
 let SessionStore = require('express-mysql-session')
 let asyncHandler = require('express-async-handler')
 let {SessionTable} = require('./models/model.js')
+let JWT = require('jsonwebtoken')
 // let history = require('connect-history-api-fallback')
 let morgan = require('morgan')
 let { host, password, database, secret_key} = require('./config')
@@ -56,21 +57,45 @@ app.use(session({
 
 // 业务路由获取openid及解决跨域问题中间件
 app.all('/api/*', asyncHandler(async function (req, res, next) {
-        let sessionid = req.headers['sessionid']
-        if (sessionid) {
-            let result = await SessionTable.findOne({where: {sessionid}})
-            // console.log(result)
-            if (result && result.openid) {
-                req.openid = result.openid
-            } else {
-                req.openid = ''
-                res.status(401).json({
-                    code: -1,
-                    message: '获取不到用户opened，请重新登录'
-                })
-                // 业务api拿不到openid的时候中间件可以return掉 没有必要再走下去了
-                return
-            }
+        let token = req.headers['token']
+        // if (sessionid) {
+        //     let result = await SessionTable.findOne({where: {sessionid}})
+        //     // console.log(result)
+        //     if (result && result.openid) {
+        //         req.openid = result.openid
+        //     } else {
+        //         req.openid = ''
+        //         res.status(401).json({
+        //             code: -1,
+        //             message: '获取不到用户opened，请重新登录'
+        //         })
+        //         // 业务api拿不到openid的时候中间件可以return掉 没有必要再走下去了
+        //         return
+        //     }
+        // }
+        if (token) {
+            JWT.verify(token, secret_key, function(err, decoded) {
+                if (err) {
+                    res.status(401).json({
+                        code: -1,
+                        message: 'token失效，需要重新登录'
+                    })
+                    return
+                } else {
+                    // res.json({
+                    //     code: 1,
+                    //     message: 'token验证通过',
+                    //     data: decoded
+                    // })
+                    req.openid = decoded.openid
+                }
+            })
+        } else {
+            res.status(401).json({
+                code: -1,
+                message: '需要重新登录'
+            })
+            return
         }
         res.header('Access-Control-Allow-Origin', '*')
         res.header('Access-Control-Allow-Headers', 'x-Request-with')

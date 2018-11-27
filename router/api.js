@@ -1,17 +1,20 @@
-
 let express = require('express')
 let router = express.Router()
-let http = require('http')
-let querystring = require('querystring')
 let request = require('request')
-let JWT = require('jsonwebtoken')
 let asyncHandler = require('express-async-handler')
-// let {SessionTable} = require('../models/model.js')
-let {secret_key} = require('../config')
+let uuidv1 = require('uuid/v1')
+// let http = require('http')
+// let querystring = require('querystring')
+let {AccountTable} = require('../models/model.js')
+let Sequelize = require('sequelize')
+let sequelize = require('../utils/sequelize.js')
+const OP = Sequelize.Op
+// let {secret_key} = require('../config')
 // let conection = require('../utils/mysql')
 // let fs = require('fs')
 // let path = require('path')
 // let multiparty = require('multiparty')
+let formatTime = require('../utils/formatTime.js')
 
 router.get('/v3', function (req, res) {
     request('https://github.com/request/request', function (error, response, body) {
@@ -38,67 +41,144 @@ router.get('/admin', asyncHandler(async function (req, res) {
     // let sessionid = req.headers['sessionid']
     // let result = await SessionTable.findAll({where: {sessionid}})
     console.log(req.openid, '-----------')
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoieGlhb2xpbiIsInVuaW9uaWQiOiJsZW8xMjEzOCIsImlhdCI6MTUzOTkyOTQ5NH0.yVmc74Ksj3VW620NbrWPqxdFDkFA606sVtJSUOb9cmA'
-    if (req.header['jwt-token'] !== undefined || token) {
-        JWT.verify(token, secret_key, function(err, decoded) {
-            if (err) {
-                res.status(401).json({
-                    code: 0,
-                    message: '无效的JWTtoken'
-                })
-            } else {
-                res.json({
-                    code: 1,
-                    message: 'JWTtoken验证通过',
-                    data: decoded
-                })
-            }
-        })
-    } else {    
-        let token = JWT.sign({ name: 'xiaolin', unionid: 'leo12138'}, secret_key)
-        res.json({
-            data: {
-                name: 'xiaolin',
-                age: 22,
-                token
-            }
-        })        
-    }
+    res.json({
+        name: 'xiaolin'
+    })
 
 }))
 
-function httpGet(host, data, path, status) {
-    let options = {
-        host: host,
-        port: 80,
-        path: path + querystring.stringify(data),
-        method: 'GET',
-        encoding: null,
-        headers: {
-            'Content-Type': 'application/json',
-            'User-Agent':
-            'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36'
+router.post('/add-account', asyncHandler(async function (req, res) {
+    console.log(formatTime(new Date()).split(' ')[1], 'post-account')
+    let {
+        account_income,
+        account_type,
+        account_fund,
+        account_date,
+        account_comment
+    } = req.body
+    if (account_fund === null || account_fund === undefined || !account_type) {
+        res.json({
+            code: 0,
+            data: null,
+            message: '关键参数不明，记账失败'
+        })
+        return
+    }
+    AccountTable.create({
+        account_id: uuidv1(),
+        openid: req.openid,
+        account_income,
+        account_type,
+        account_fund,
+        account_date: account_date + ' ' + formatTime(new Date()).split(' ')[1],
+        account_comment
+    }).then(() => {
+        res.json({
+            code: 1,
+            data: null,
+            message: '新增记录成功'
+        })
+    }).catch((err) => {
+        res.status(500).json({
+            code: 1,
+            data: err,
+            message: JSON.stringify(err)
+        })
+    })
+}))
+
+function compare(key) {
+    return function (obj1, obj2) {
+        var val1 = +new Date(obj1[key])
+        var val2 = +new Date(obj2[key])
+        if (val1 < val2) {
+            return 1
+        } else if (val1 > val2) {
+            return -1
+        } else {
+            return 0
         }
     }
-    if (status) {
-        http = require('https')
-        options.port = 443
-    }
-    return new Promise(function (resolve, reject) {
-        let body = ''
-        let getReq = http.request(options, function (response) {
-            // response.setEncoding('utf8');
-            response.on('data', function (chunk) {
-                body += chunk
-            })
-            response.on('end', () => {
-                resolve(body)
-            })
-            response.on('error', err => {
-                reject(err)
-            })
-        })
-        getReq.end()
-    })
 }
+router.get('/get-account', asyncHandler(async function (req, res) {
+    let year = req.query.year ? req.query.year : new Date().getFullYear + ''
+    AccountTable.findAll({
+        where: {
+            openid: {
+                [OP.eq]: req.openid
+            }
+            // order: sequelize.col('account_date')
+        }
+    }).then((data) => {
+        if (data && data.length) {
+            let accountList = data.sort(compare('account_date')).filter((item) => {
+                let calcyear = new Date(item.account_date).getFullYear() + ''
+                return calcyear === year
+            })
+            accountList = accountList.map((item) => {
+                return {
+                    id: item.account_id,
+                    openid: item.openid,
+                    income: item.account_income,
+                    type: item.account_type,
+                    fund: item.account_fund,
+                    date: item.account_date,
+                    comment: item.account_comment,
+                    created: item.createdAt,
+                    updated: item.updatedAt
+                }
+            })
+            // console.log(accountList)
+            let monthArr = [[],[],[],[],[],[],[],[],[],[],[],[]]
+            accountList.forEach((item, index) => {
+                let dateStr = JSON.stringify(item.date)
+                let month = Number(dateStr.split('T')[0].split('-')[1])
+                monthArr[month - 1].push(item)
+            })
+            res.json({
+                code: 1,
+                data: monthArr,
+                message: '查询记录成功'
+            })
+        } else {
+            res.json({
+                code: 1,
+                data: [],
+                message: '查询记录成功'
+            })
+        }
+    }).catch((err) => {
+        console.log(err)
+        res.status(500).json({
+            code: 0,
+            data: err,
+            message: JSON.stringify(err)
+        })
+    })
+}))
+router.get('/account-info', asyncHandler(async function (req, res) {
+    let year = req.query.year || new Date().getFullYear()
+    AccountTable.findAll({
+        where: {openid: req.openid}
+    }).then((data) => {
+        let accountList = data.filter((item) => {
+            let calcyear = new Date(item.account_date).getFullYear() + ''
+            return calcyear === year
+        })
+        let income = 0, outcome = 0
+        accountList.forEach((item) => {
+            if (item.account_income === 1) {
+                income += Number(item.account_fund)
+            } else {
+                outcome += Number(item.account_fund)
+            }
+        })
+        console.log(income, outcome)
+        res.json({
+            income, 
+            outcome,
+            total: accountList.length
+        })
+    })
+}))
 module.exports = router

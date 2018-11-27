@@ -33,6 +33,7 @@ window.onload = function () {
     }
     calcAge () {
       return this.age > 18 ? 'old' : 'young'
+      console.log(getTime(), 111)
     }
     static getTime () { // 类的静态方法 通过 Person.getTime 获取(类中类外均可)
       return +new Date()
@@ -50,9 +51,108 @@ window.onload = function () {
   // consoleName()
 
   console.log(person1.calcAge())
+  console.log(Person.getTime(), 222)
 
-  // console.log(person1.job)
-  
+  class MyWaterFull {
+    constructor (opt) {
+      if (opt instanceof Array) {
+        this.rowArr = opt
+      } else {
+        this.rowArr = []
+      }
+    }
+    initArr (arr) {
+      if (arr instanceof Array === false || arr.length === 0) {
+        return []
+      }
+      let rowArr = arr
+      let heightArr = arr.map((item, index) => {
+        let tempH = (item.posterH / item.posterW) * 168
+        rowArr[index].selected = false
+        rowArr[index].tempH = tempH
+        return tempH
+      })
+      let stepDistArr = []
+      heightArr.forEach((item, index) => {
+        if (index % 2 === 1 && index >= 1) {
+          stepDistArr.push(heightArr[index] - heightArr[index - 1])
+        }
+      })
+      stepDistArr.forEach((item, index) => {
+        if (index >= 1) {
+          let countDist = 0
+          for (let i = 0; i < index; i++) {
+            countDist += stepDistArr[i]
+          }
+          if ((countDist > 0 && heightArr[index * 2 + 1] > heightArr[index * 2]) || (countDist < 0 && heightArr[index * 2 + 1] < heightArr[index * 2])) {
+            let tmp = heightArr[index * 2]
+            heightArr[index * 2] = heightArr[index * 2 + 1]
+            heightArr[index * 2 + 1] = tmp
+            let tmp2 = rowArr[index * 2]
+            rowArr[index * 2] = rowArr[index * 2 + 1]
+            rowArr[index * 2 + 1] = tmp2
+            stepDistArr[index] = -stepDistArr[index]
+          }
+        }
+      })
+      let rowArrL = rowArr.filter((item, index) => {
+        return index % 2 === 0
+      })
+      let rowArrR = rowArr.filter((item, index) => {
+        return index % 2 === 1
+      })
+      if (rowArrL.length > 1 && rowArrR.length > 1) {
+        let loopMark = true
+        while (loopMark) {
+          let compare =  this.getSumCompare(rowArrL, rowArrR)
+          if (this.getSumCompare(rowArrL, rowArrR) > (rowArrL[rowArrL.length - 1].tempH + 1)) {
+            rowArrR.push(rowArrL.pop())
+            console.log('popL-R')
+          } else if (this.getSumCompare(rowArrR, rowArrL) > (rowArrR[rowArrR.length - 1].tempH + 1)) {
+            rowArrL.push(rowArrR.pop())
+            console.log('popR-L')
+          } else {
+            loopMark = false
+          }
+        }
+      }
+      return {
+        rowArrL,
+        rowArrR
+      }
+    }
+    getSumCompare (arr1, arr2) {
+      if (!(arr1 instanceof Array && arr2 instanceof Array)) {
+        return new Error('参数错误')
+      }
+      let sum1 = 0, sum2 = 0
+      arr1.forEach((item) => {
+        sum1 += Number(item.tempH)
+      })
+      arr2.forEach((item) => {
+        sum2 += Number(item.tempH)
+      })
+      return sum1 - sum2
+    }
+    getTwoCol () {
+      return this.initArr(this.rowArr)
+    }
+  }
+  let arr = [
+    {posterW: 100, posterH: 60},
+    {posterW: 100, posterH: 800},
+    {posterW: 100, posterH: 200}, 
+    {posterW: 100, posterH: 200}, 
+    {posterW: 100, posterH: 100}, 
+    {posterW: 100, posterH: 90}, 
+    {posterW: 100, posterH: 80}, 
+    {posterW: 100, posterH: 70}, 
+    {posterW: 100, posterH: 60}
+  ]
+  let arrs = [{"vid":118,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/4cae6b5b5285890783177049667/snapshot/1542961450_4011113816.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/4cae6b5b5285890783177049667/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":117,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/12b6bf7d5285890783176897119/snapshot/1542960579_2822010188.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/12b6bf7d5285890783176897119/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":116,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/06e4f6115285890783176370382/snapshot/1542958367_2550853208.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/06e4f6115285890783176370382/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":115,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/04b906fc5285890783176299950/snapshot/1542958100_352347140.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/04b906fc5285890783176299950/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":114,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/0490f6555285890783176272718/snapshot/1542957562_1474568299.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/0490f6555285890783176272718/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":113,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/c58377555285890783175862039/snapshot/1542955426_2262906402.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/c58377555285890783175862039/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":112,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/c2f8b01e5285890783175733798/snapshot/1542954895_665409627.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/c2f8b01e5285890783175733798/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":111,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/c06c242c5285890783175601714/snapshot/1542954000_4011279502.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/c06c242c5285890783175601714/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":110,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/bc406a0f5285890783175471280/snapshot/1542953241_3822934879.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/bc406a0f5285890783175471280/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":109,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/bbe609365285890783175421895/snapshot/1542952786_3548246014.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/bbe609365285890783175421895/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":108,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/b990366e5285890783175320196/snapshot/1542952418_4027111090.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/b990366e5285890783175320196/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":107,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/b7b9c1735285890783175290366/snapshot/1542951949_3339677704.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/b7b9c1735285890783175290366/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":106,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/b3134af75285890783175097455/snapshot/1542951399_3067003284.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/b3134af75285890783175097455/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":105,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/b294a7b15285890783175027636/snapshot/1542950907_2302279759.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/b294a7b15285890783175027636/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"},{"vid":104,"poster":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/6cf33a525285890783174375371/snapshot/1542947048_812951461.100_0.jpg","url":"http://1258047925.vod2.myqcloud.com/eb737915vodtranscq1258047925/6cf33a525285890783174375371/v.f40.mp4","posterH":1920,"posterW":1088,"like":0,"Permisson":1,"recommend":false,"uploadTime":"2018.11.23"}]
+  let waterarr = new MyWaterFull(arr)
+  let {rowArrL, rowArrR} = waterarr.getTwoCol()
+  console.log(rowArrL, rowArrR)
 }
 </script>
 </body>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+  <script src="main.js"></script> -->
+  
+  <style>
+  @font-face {
+    font-family: "iconfont";
+    src: url('./fonts/pinghei.ttf') format(truetype);
+  }
+  .iconfont {
+    font-family: iconfont;
+  }
+  </style>
+</head>
+<body>
+  <h1 class="iconfont">小牛人专注之星徽章力反应</h1>
+  <script>
+ function waterFull (arr) {
+    if (arr instanceof Array === false || arr.length === 0) {
+      return []
+    }
+    let rowArr = arr
+    let heightArr = arr.map((item, index) => {
+      rowArr[index].selected = false
+      return (item.posterH / item.posterW) * 168
+    })
+    let stepDistArr = []
+    heightArr.forEach((item, index) => {
+      if (index % 2 === 1 && index >= 1) {
+        stepDistArr.push(heightArr[index] - heightArr[index - 1])
+      }
+    })
+    stepDistArr.forEach((item, index) => {
+      if (index >= 1) {
+        let countDist = 0
+        for (let i = 0; i < index; i++) {
+          countDist += stepDistArr[i]
+        }
+        if ((countDist > 0 && heightArr[index * 2 + 1] > heightArr[index * 2]) || (countDist < 0 && heightArr[index * 2 + 1] < heightArr[index * 2])) {
+          let tmp = heightArr[index * 2]
+          heightArr[index * 2] = heightArr[index * 2 + 1]
+          heightArr[index * 2 + 1] = tmp
+          let tmp2 = rowArr[index * 2]
+          rowArr[index * 2] = rowArr[index * 2 + 1]
+          rowArr[index * 2 + 1] = tmp2
+          stepDistArr[index] = -stepDistArr[index]
+        }
+      }
+    })
+    return rowArr
+  }
+  console.log(waterFull([
+    {
+      posterH: 100,
+      posterW: 200
+    },
+    {
+      posterH: 200,
+      posterW: 100
+    },
+    {
+      posterH: 100,
+      posterW: 200
+    },
+    {
+      posterH: 200,
+      posterW: 100
+    }
+  ]))
+  
+  </script>
+</body>
+</html>

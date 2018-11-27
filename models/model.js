@@ -62,12 +62,12 @@ const AccountTable = sequelize.define('account_table', {
     type: Sequelize.STRING(4)
   },
   account_fund: {
-    type: Sequelize.BIGINT
+    type: Sequelize.FLOAT
   },
   account_comment: {
     type: Sequelize.STRING
   },
-  account_time: {
+  account_date: {
     type: Sequelize.DATE
   }
 });
