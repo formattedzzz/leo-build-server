@@ -80,7 +80,7 @@ router.post('/add-account', asyncHandler(async function (req, res) {
         })
     }).catch((err) => {
         res.status(500).json({
-            code: 1,
+            code: 0,
             data: err,
             message: JSON.stringify(err)
         })
