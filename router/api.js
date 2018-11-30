@@ -7,7 +7,6 @@ let uuidv1 = require('uuid/v1')
 // let querystring = require('querystring')
 let {AccountTable} = require('../models/model.js')
 let Sequelize = require('sequelize')
-let sequelize = require('../utils/sequelize.js')
 const OP = Sequelize.Op
 // let {secret_key} = require('../config')
 // let conection = require('../utils/mysql')
@@ -40,13 +39,68 @@ router.get('/v2', function (req, res) {
 router.get('/admin', asyncHandler(async function (req, res) {
     // let sessionid = req.headers['sessionid']
     // let result = await SessionTable.findAll({where: {sessionid}})
-    console.log(req.openid, '-----------')
     res.json({
         name: 'xiaolin'
     })
-
 }))
-
+router.put('/edit-account', asyncHandler(async function (req, res) {
+    let {
+        account_id,
+        account_income,
+        account_type,
+        account_fund,
+        account_date,
+        account_comment
+    } = req.body
+    if (!account_id) {
+        res.status(403).json({
+            code: 0,
+            data: null,
+            message: 'account_id缺失'
+        })
+    }
+    AccountTable.update(
+        {
+            account_id,
+            account_income,
+            account_type,
+            account_fund,
+            account_date,
+            account_comment
+        },
+        {where: {account_id: account_id}}
+    ).then(() => {
+        res.json({
+            code: 1,
+            data: 'null',
+            message: '保存成功'
+        })
+    }).catch((err) => {
+        res.status(500).json({
+            code: 0,
+            data: err,
+            message: JSON.stringify(err)
+        })
+    })
+}))
+router.delete('/del-account', asyncHandler(async function (req, res) {
+    let {account_id} = req.body
+    AccountTable.destroy({
+        where: {account_id: account_id}
+    }).then(() =>{
+        res.json({
+            code: 1,
+            data: null,
+            message: '删除成功'
+        })
+    }).catch((err) => {
+        res.status(500).json({
+            code: 0,
+            data: err,
+            message: JSON.stringify(err)
+        })
+    })
+}))
 router.post('/add-account', asyncHandler(async function (req, res) {
     console.log(formatTime(new Date()).split(' ')[1], 'post-account')
     let {
