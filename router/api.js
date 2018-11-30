@@ -222,12 +222,15 @@ router.get('/account-info', asyncHandler(async function (req, res) {
         let income = 0, outcome = 0
         accountList.forEach((item) => {
             if (item.account_income === 1) {
-                income += Number(item.account_fund).toFixed(2)
+                income += Number(item.account_fund)
+                
             } else {
-                outcome += Number(item.account_fund).toFixed(2)
+                outcome += Number(item.account_fund)
+                
             }
         })
-        console.log(income, outcome)
+        income = income.toFixed(2)
+        outcome = outcome.toFixed(2)
         res.json({
             income, 
             outcome,
