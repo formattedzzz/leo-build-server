@@ -56,13 +56,16 @@ function findSocketByid(id = '') {
 
 setInterval(() => {
   if (matchingArr.length >= 2) {
-    let matchingLength = matchingArr.length % 2 === 0 ? matchingArr.length : matchingArr.length - 1
-    for (let i = 0; i < matchingLength / 2; i++) {
-      let VSdata = [matchingArr[i], matchingArr[i + 1]]
-      matchingArr[i].socket.emit('matched', VSdata)
-      matchingArr[i + 1].socket.emit('matched', VSdata)
-    }
-    matchingArr.splice(0, matchingLength)
+    // let matchingLength = matchingArr.length % 2 === 0 ? matchingArr.length : matchingArr.length - 1
+    // for (let i = 0; i < matchingLength / 2; i++) {
+    //   let VSdata = [matchingArr[i], matchingArr[i + 1]]
+    //   matchingArr[i].socket.emit('matched', VSdata)
+    //   matchingArr[i + 1].socket.emit('matched', VSdata)
+    // }
+    // matchingArr.splice(0, matchingLength)
+    matchingArr.forEach((item) => {
+      item.socket.emit('matched', [{}, {}])
+    })
   } else {
     if (matchingArr.length) {
       matchingArr[0].socket.emit('match_failed')
