@@ -113,11 +113,11 @@ IO.of('/user').on('connection', asyncHandler( async (socket) => {
   //   console.log(msg)
   // })
   socket.on('disconnect', () => {
-    console.log(matchingArr.length)
+    console.log(userSocketArr.length)
     debug.warn(socket.id, '客户端已经断开连接')
     delOnlineSocketByid(socket.id)
     delMatchingSocketByid(socket.id)
-    debug.success(matchingArr.length, 'offline')
+    debug.success(userSocketArr.length, 'offline')
   })
   let currentSocket = {
     socket,
