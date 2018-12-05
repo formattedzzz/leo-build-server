@@ -66,7 +66,7 @@ setInterval(() => {
   } else {
     if (matchingArr.length) {
       matchingArr[0].socket.emit('match_failed')
-      matchingArr.pop()
+      matchingArr.splice(0, 1)
     }
   }
 }, 5000)
