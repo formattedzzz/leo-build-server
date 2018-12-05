@@ -11,7 +11,7 @@ const sequelize = new Sequelize('account', 'root', require('../config.js').passw
     idle: 10000
   },
   options: {
-    charset: 'utf-8'
+    charset: 'utf8mb4'
   },
   logging: false
   // storage: 'path/to/database.sqlite'

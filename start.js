@@ -66,7 +66,7 @@ setInterval(() => {
   } else {
     if (matchingArr.length) {
       matchingArr[0].socket.emit('match_failed')
-      matchingArr.pop()
+      matchingArr.splice(0, 1)
     }
   }
 }, 5000)
@@ -92,14 +92,6 @@ IO.of('/user').on('connection', asyncHandler( async (socket) => {
     return
   }
   let {nickname, avatar} = await UserTable.findOne({where: {openid}})
-  let currentSocket = {
-    socket,
-    openid,
-    nickname,
-    avatar,
-    matched: false
-  }
-  userSocketArr.push(currentSocket)
   socket.on('need_match', () => {
     console.log(socket.id, ' need match')
     console.log(matchingArr.length)
@@ -118,10 +110,20 @@ IO.of('/user').on('connection', asyncHandler( async (socket) => {
   //   console.log(msg)
   // })
   socket.on('disconnect', () => {
+    console.log(matchingArr.length)
     debug.warn(socket.id, '客户端已经断开连接')
     delOnlineSocketByid(socket.id)
     delMatchingSocketByid(socket.id)
+    debug.success(matchingArr.length, 'offline')
   })
+  let currentSocket = {
+    socket,
+    openid,
+    nickname,
+    avatar,
+    matched: false
+  }
+  userSocketArr.push(currentSocket)
   // 遍历所有客户端
   // IO.of('/user').clients((error, clients) => {
   //   if (error) throw error;
