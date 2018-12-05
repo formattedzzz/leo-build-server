@@ -56,16 +56,25 @@ function findSocketByid(id = '') {
 
 setInterval(() => {
   if (matchingArr.length >= 2) {
-    // let matchingLength = matchingArr.length % 2 === 0 ? matchingArr.length : matchingArr.length - 1
-    // for (let i = 0; i < matchingLength / 2; i++) {
-    //   let VSdata = [matchingArr[i], matchingArr[i + 1]]
-    //   matchingArr[i].socket.emit('matched', VSdata)
-    //   matchingArr[i + 1].socket.emit('matched', VSdata)
-    // }
-    // matchingArr.splice(0, matchingLength)
-    matchingArr.forEach((item) => {
-      item.socket.emit('matched', [{}, {}])
-    })
+    let matchingLength = matchingArr.length % 2 === 0 ? matchingArr.length : matchingArr.length - 1
+    for (let i = 0; i < matchingLength / 2; i++) {
+      let VS1 = {
+        openid: matchingArr[i].openid, 
+        nickname: matchingArr[i].nickname,
+        socketid: matchingArr[i].socket.id,
+        avatar: matchingArr[i].avatar
+      }
+      let VS1 = {
+        openid: matchingArr[i + 1].openid, 
+        nickname: matchingArr[i + 1].nickname,
+        socketid: matchingArr[i + 1].socket.id,
+        avatar: matchingArr[i + 1].avatar
+      }
+      let VSdata = [VS1, VS2]
+      matchingArr[i].socket.emit('matched', VSdata)
+      matchingArr[i + 1].socket.emit('matched', VSdata)
+    }
+    matchingArr.splice(0, matchingLength)
   } else {
     if (matchingArr.length) {
       matchingArr[0].socket.emit('match_failed')
