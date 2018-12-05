@@ -64,7 +64,7 @@ setInterval(() => {
         socketid: matchingArr[i].socket.id,
         avatar: matchingArr[i].avatar
       }
-      let VS1 = {
+      let VS2 = {
         openid: matchingArr[i + 1].openid, 
         nickname: matchingArr[i + 1].nickname,
         socketid: matchingArr[i + 1].socket.id,
