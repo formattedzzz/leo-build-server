@@ -119,7 +119,7 @@ router.post('/add-account', asyncHandler(async function (req, res) {
         return
     }
     AccountTable.create({
-        account_id: uuidv1(),
+        account_id: uuidv1().substr(0, 13),
         openid: req.openid,
         account_income,
         account_type,

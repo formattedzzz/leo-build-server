@@ -7,7 +7,6 @@ let cookieParser = require('cookie-parser')
 let session = require('express-session')
 let SessionStore = require('express-mysql-session')
 let asyncHandler = require('express-async-handler')
-let {SessionTable} = require('./models/model.js')
 let JWT = require('jsonwebtoken')
 // let history = require('connect-history-api-fallback')
 let morgan = require('morgan')
@@ -128,6 +127,7 @@ app.use('/upload', upload)
 
 module.exports = require('http').createServer(app)
 
+// 这里为了socket跟app为同一个端口 不适用app.listen 来监听端口 而是通过app 创建一个全新的http服务
 
 
 

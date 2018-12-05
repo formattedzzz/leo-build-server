@@ -2,17 +2,17 @@ let Sequelize = require('sequelize')
 let sequelize = require('../utils/sequelize.js')
 // conection.connect()
 // sessionid openid映射表
-const SessionTable = sequelize.define('session_table', {
-  sessionid: {
-    type: Sequelize.STRING
-  },
-  openid: {
-    type: Sequelize.STRING
-  },
-  session_key: {
-    type: Sequelize.STRING
-  }
-});
+// const SessionTable = sequelize.define('session_table', {
+//   sessionid: {
+//     type: Sequelize.STRING
+//   },
+//   openid: {
+//     type: Sequelize.STRING
+//   },
+//   session_key: {
+//     type: Sequelize.STRING
+//   }
+// });
 // 用户信息表
 const UserTable = sequelize.define('user_table', {
   openid: {
@@ -95,7 +95,7 @@ const AccountTypeTable = sequelize.define('account_type_table', {
 });
 
 
-[SessionTable, UserTable, AccountTable, AccountTypeTable].forEach((item, index) => {
+[UserTable, AccountTable, AccountTypeTable].forEach((item, index) => {
   item.sync({ alter: true })
   .then(() => {
     console.log(`${item.tableName} is already.`)
@@ -105,7 +105,6 @@ const AccountTypeTable = sequelize.define('account_type_table', {
   })
 })
 module.exports = {
-  SessionTable,
   UserTable,
   AccountTable,
   AccountTypeTable
