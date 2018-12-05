@@ -70,7 +70,6 @@ setInterval(() => {
     }
   }
 }, 5000)
-
 async function getOpenid (token) {
   return new Promise((resolve, reject) => {
     JWT.verify(token, config.secret_key, function (err, decoded) {
@@ -102,12 +101,13 @@ IO.of('/user').on('connection', asyncHandler( async (socket) => {
   }
   userSocketArr.push(currentSocket)
   socket.on('need_match', () => {
-    debug.log(socket.id, ' need match')
-    // debug.success(matchingArr.length)
+    console.log(socket.id, ' need match')
+    console.log(matchingArr.length)
     matchingArr.push(currentSocket)
+    debug.success(matchingArr.length)
   })
   socket.on('cancel_match', () => {
-    debug.log(socket.id, ' cancel match')
+    console.log(socket.id, ' cancel match')
     delMatchingSocketByid(socket.id)
   })
   // one2one(openid, openid, 'this is a private msg')
