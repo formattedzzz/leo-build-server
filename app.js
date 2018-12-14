@@ -20,7 +20,6 @@ let mysqlOptions = {
 let gameHub = require('./game/GameHub.js')
 let app = express()
 let httpserver = require('http').createServer(app)
-
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
 app.set('secret_key', config.secret_key)
@@ -43,6 +42,7 @@ app.use(session({
   },
   store: new SessionStore(mysqlOptions)
 }))
+
 // app.get('/', function (req, res, next) {
 //   console.log(req.session)
 //   if (req.session.views) {
@@ -56,9 +56,17 @@ app.use(session({
 //     res.end('welcome to the session demo. refresh!')
 //   }
 // })
+app.all('*', function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'x-Request-with')
+  res.header('Access-Control-Allow-Credentials', true)
+  res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
+  next()
+})
 
 // 业务路由获取openid及解决跨域问题中间件
 app.all('/api/*', asyncHandler(async function (req, res, next) {
+  res.header('Content-Type', 'application/json;charset=utf-8')
   let token = req.headers['token']
   if (token) {
     JWT.verify(token, config.secret_key, function (err, decoded) {
@@ -79,11 +87,6 @@ app.all('/api/*', asyncHandler(async function (req, res, next) {
     })
     return
   }
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'x-Request-with')
-  res.header('Access-Control-Allow-Credentials', true)
-  res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
-  res.header('Content-Type', 'application/json;charset=utf-8')
   next()
 }));
 // 错误捕获中间件 这里捕获的不是逻辑上会走的错误，而是代码语法上的错误 
@@ -108,6 +111,7 @@ app.use('/wx', router_wxapi)
 app.use('/views', router_views)
 app.use('/upload', router_upload)
 
+// console.log(app)
 // 将socket服务挂载到通过app构建的httpserver
 gameHub.init(httpserver)
 

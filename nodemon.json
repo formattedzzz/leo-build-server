@@ -8,7 +8,8 @@
     ".gitignore",
     "upload",
     "static",
-    "readme.md"
+		"readme.md",
+		"log.js"
 	],
 	"verbose": true,
 	"execMap": {

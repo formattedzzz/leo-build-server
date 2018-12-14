@@ -3,3 +3,4 @@ test/
 upload/
 access.log
 .Ds_Store
+static/logs/
