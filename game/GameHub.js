@@ -55,8 +55,10 @@ GameHub.prototype.verify_token = function (IO) {
 }
 
 GameHub.prototype.send_to = function (from, to, msg = 'one-to-one message') {
+  console.log('send to')
   this.online_clients.forEach((item) => {
     if (item.socketid === to) {
+      console.log('find')
       item.socket.emit('private_msg', {from, msg})
     }
   })
@@ -173,6 +175,7 @@ GameHub.prototype.init = function (httpserver, options) {
     })
 
     socket.on('update_score', (data) => {
+      console.log('updateC', data)
       let {score, socketid} = data
       this.send_to(socket.id, socketid, score)
     })
