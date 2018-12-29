@@ -172,7 +172,7 @@ GameHub.prototype.init = function (httpserver, options) {
       console.log(this.online_clients.length, 'offline')
     })
 
-    socket.on('update_score', function (data) {
+    socket.on('update_score', (data) => {
       let {score, socketid} = this
       this.send_to(socket.id, socketid, score)
     })
