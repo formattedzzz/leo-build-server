@@ -56,7 +56,7 @@ GameHub.prototype.verify_token = function (IO) {
 
 GameHub.prototype.send_to = function (from, to, msg = 'one-to-one message') {
   this.online_clients.forEach((item) => {
-    if (item.openid === to) {
+    if (item.socketid === to) {
       item.socket.emit('private_msg', {from, msg})
     }
   })
