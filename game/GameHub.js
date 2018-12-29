@@ -173,7 +173,7 @@ GameHub.prototype.init = function (httpserver, options) {
     })
 
     socket.on('update_score', (data) => {
-      let {score, socketid} = this
+      let {score, socketid} = data
       this.send_to(socket.id, socketid, score)
     })
 
