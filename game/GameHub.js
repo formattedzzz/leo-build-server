@@ -131,7 +131,7 @@ GameHub.prototype.run_beat_system = function (clients) {
         client.socket.send('beats me plz!')
       })
     }
-  }, 60000)
+  }, 40000)
 }
 
 GameHub.prototype.init = function (httpserver, options) {
