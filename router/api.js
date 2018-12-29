@@ -27,13 +27,7 @@ router.get('/v3', function (req, res) {
         })
     })
 })
-router.get('/v2', function (req, res) {
-    throw new Error('故意丢的错误')
-    res.json({
-        code: 1,
-        message: '中间发生了错误'
-    })
-})
+
 // JWT试验路由 小程序在登录后拿到opened和session_key后下发token 再写一个router.use()中间件
 // if token将解密后的openeid 挂载到req下 next() 否则res.status(403).json({}) 
 router.get('/admin', asyncHandler(async function (req, res) {

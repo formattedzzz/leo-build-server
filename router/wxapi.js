@@ -65,37 +65,6 @@ router.post('/login', function (req, res) {
             message: '登录成功',
             token
         })
-        // SessionTable.findOne({ where: {openid: openid} }).then((session) => {
-        //     if (session) {
-        //         // console.log('有记录')
-        //         let uuid = uuidv1()
-        //         SessionTable.update({session_key: session_key, sessionid: uuid}, {where: {openid: openid} }).then(()=>{
-        //             console.log('老用户sessionID更新成功！')
-        //             res.header('sessionID', uuid)
-        //             res.json({
-        //                 code: 1,
-        //                 message: '自定义登录态成功！',
-        //                 sessionID: uuid
-        //             })
-        //         })
-        //     }else{
-        //         // console.log('没记录')
-        //         let uuid = uuidv1()
-        //         SessionTable.create({
-        //             session_key: session_key,
-        //             openid: openid,
-        //             sessionid: uuid
-        //         }).then(()=>{
-        //             console.log('新用户sessionID创建成功！')
-        //             res.header('sessionID', uuid)        
-        //             res.json({
-        //                 code: 1,
-        //                 message: '自定义登录态成功！',
-        //                 sessionID: uuid
-        //             })
-        //         })
-        //     }
-        // })
     }).catch((err) => {
         console.log(err)
         res.json({
