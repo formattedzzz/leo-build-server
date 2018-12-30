@@ -128,7 +128,7 @@ GameHub.prototype.run_match_system = function (clients) {
 
 GameHub.prototype.run_beat_system = function () {
   setInterval(() => {
-    this.of('/user').emit('beat_req')
+    this.io.of('/user').emit('beat_req')
     // if (clients && clients.length) {
     //   clients.forEach((client) => {
     //     client.socket.send('beat me!')
