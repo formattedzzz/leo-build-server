@@ -1,42 +1,21 @@
 let express = require('express')
 let router = express.Router()
-let request = require('request')
 let asyncHandler = require('express-async-handler')
 let uuidv1 = require('uuid/v1')
-// let http = require('http')
-// let querystring = require('querystring')
-let {AccountTable} = require('../models/model.js')
+let {AccountTable, QarecordTable} = require('../models/model.js')
 let Sequelize = require('sequelize')
 const OP = Sequelize.Op
-// let {secret_key} = require('../config')
-// let conection = require('../utils/mysql')
-// let fs = require('fs')
-// let path = require('path')
-// let multiparty = require('multiparty')
-let formatTime = require('../utils/formatTime.js')
-
-router.get('/v3', function (req, res) {
-    request('https://github.com/request/request', function (error, response, body) {
-        // console.log('error:', error)
-        // console.log('statusCode:', response && response.statusCode)
-        // console.log('body:', body)
-        res.json({
-            status: response && response.statusCode,
-            error: error,
-            body: body
-        })
-    })
-})
+let {formatTime, compare} = require('../utils/tool.js')
 
 // JWT试验路由 小程序在登录后拿到opened和session_key后下发token 再写一个router.use()中间件
 // if token将解密后的openeid 挂载到req下 next() 否则res.status(403).json({}) 
 router.get('/admin', asyncHandler(async function (req, res) {
-    // let sessionid = req.headers['sessionid']
-    // let result = await SessionTable.findAll({where: {sessionid}})
+    console.log(req.openid)
     res.json({
         name: 'xiaolin'
     })
 }))
+// 修改记账
 router.put('/edit-account', asyncHandler(async function (req, res) {
     let {
         account_id,
@@ -77,6 +56,8 @@ router.put('/edit-account', asyncHandler(async function (req, res) {
         })
     })
 }))
+
+// 删除记账
 router.delete('/del-account', asyncHandler(async function (req, res) {
     let {account_id} = req.body
     AccountTable.destroy({
@@ -95,6 +76,8 @@ router.delete('/del-account', asyncHandler(async function (req, res) {
         })
     })
 }))
+
+// 新增记账
 router.post('/add-account', asyncHandler(async function (req, res) {
     console.log(formatTime(new Date()).split(' ')[1], 'post-account')
     let {
@@ -135,19 +118,7 @@ router.post('/add-account', asyncHandler(async function (req, res) {
     })
 }))
 
-function compare(key) {
-    return function (obj1, obj2) {
-        var val1 = +new Date(obj1[key])
-        var val2 = +new Date(obj2[key])
-        if (val1 < val2) {
-            return 1
-        } else if (val1 > val2) {
-            return -1
-        } else {
-            return 0
-        }
-    }
-}
+// 获取账本
 router.get('/get-account', asyncHandler(async function (req, res) {
     let year = req.query.year ? req.query.year : new Date().getFullYear + ''
     AccountTable.findAll({
@@ -204,6 +175,8 @@ router.get('/get-account', asyncHandler(async function (req, res) {
         })
     })
 }))
+
+// 获取账本信息
 router.get('/account-info', asyncHandler(async function (req, res) {
     let year = req.query.year || new Date().getFullYear()
     AccountTable.findAll({
@@ -229,6 +202,58 @@ router.get('/account-info', asyncHandler(async function (req, res) {
             income, 
             outcome,
             total: accountList.length
+        })
+    })
+}))
+
+// 新增对战记录
+router.post('/add-qarecord', asyncHandler(async function (req, res) {
+    let {record_self, record_match, record_winner, record_qatype} = req.body
+    QarecordTable.create({
+        record_id: uuidv1().substr(0, 13),
+        record_self,
+        record_match,
+        record_winner,
+        record_qatype
+    }).then(() => {
+        res.json({
+            code: 1,
+            data: null,
+            message: '对局记录成功'
+        })
+    }).catch((err) => {
+        res.status(500).json({
+            code: 0,
+            data: JSON.stringify(err),
+            message: '对局记录失败'
+        })
+    })
+}))
+
+// 获取对战记录
+router.get('/get-qarecord', asyncHandler(async function (req, res) {
+    QarecordTable.findAndCountAll({
+        where: {
+            [Op.or]: [
+                {
+                    record_self: {[Op.like]: `%${req.openid}`}
+                },
+                {
+                    record_match: {[Op.like]: `%${req.openid}`}
+                }
+            ]
+        }
+    }).then((data) => {
+        res.json({
+            code: 1,
+            data: data,
+            message: '获取对局记录成功'
+        })
+    }).catch((err) => {
+        res.status(500).json({
+            code: 0,
+            data: JSON.stringify(err),
+            message: '获取对局记录失败'
         })
     })
 }))

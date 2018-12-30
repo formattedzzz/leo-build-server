@@ -1,19 +1,8 @@
 let Sequelize = require('sequelize')
 let sequelize = require('../utils/sequelize.js')
 // conection.connect()
-// sessionid openid映射表
-// const SessionTable = sequelize.define('session_table', {
-//   sessionid: {
-//     type: Sequelize.STRING
-//   },
-//   openid: {
-//     type: Sequelize.STRING
-//   },
-//   session_key: {
-//     type: Sequelize.STRING
-//   }
-// });
-// 用户信息表
+
+// -------------------------------------------用户信息表
 const UserTable = sequelize.define('user_table', {
   openid: {
     type: Sequelize.STRING
@@ -37,7 +26,7 @@ const UserTable = sequelize.define('user_table', {
     type: Sequelize.STRING
   }
 });
-// 记账记录总表
+// -------------------------------------------记账记录总表
 /**
  * @param account_id 记账记录ID
  * @param openid 记账人openid
@@ -71,7 +60,7 @@ const AccountTable = sequelize.define('account_table', {
     type: Sequelize.DATE
   }
 });
-// 记账类型表
+// --------------------------------------------记账类型表
 /**
  * @param type_id 类型ID
  * @param type_desc 类型描述
@@ -94,8 +83,36 @@ const AccountTypeTable = sequelize.define('account_type_table', {
   },
 });
 
+// ------------------------------------------答题记录表
+/**
+ * @param record_id 对战记录ID
+ * @param record_self 两方的己方信息
+ * @param record_match 两方的对方信息
+ * @param record_winner 赢了没 1 赢了 0 输了 2 平局
+ * @param record_qatype 对战题目类型
+ */
 
-[UserTable, AccountTable, AccountTypeTable].forEach((item, index) => {
+const QarecordTable = sequelize.define('qarecord_table', {
+  record_id: {
+    type: Sequelize.STRING,
+    primaryKey: true
+  },
+  record_self: {
+    type: Sequelize.STRING
+  },
+  record_match: {
+    type: Sequelize.STRING
+  },
+  record_winner: {
+    type: Sequelize.INTEGER
+  },
+  record_qatype: {
+    type: Sequelize.STRING(4)
+  }
+});
+
+
+[UserTable, AccountTable, AccountTypeTable, QarecordTable].forEach((item, index) => {
   item.sync({ alter: true })
   .then(() => {
     console.log(`${item.tableName} is already.`)
@@ -107,7 +124,8 @@ const AccountTypeTable = sequelize.define('account_type_table', {
 module.exports = {
   UserTable,
   AccountTable,
-  AccountTypeTable
+  AccountTypeTable,
+  QarecordTable
 }
 // bbb()
 // SessionTable.findOne({where: {openid: 'openid'}}).then((res)=>{

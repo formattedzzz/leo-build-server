@@ -116,7 +116,7 @@ GameHub.prototype.run_match_system = function (clients) {
         clients[2 * i + 1].socket.emit('matched', VSdata)
       }
       clients.splice(0, matchingLength)
-      console.log('还剩', this.matching_clients.length)
+      console.log('匹配了' + matchingLength + '人,还剩', this.matching_clients.length)
     } else {
       if (clients.length) {
         clients[0].socket.emit('match_failed')
@@ -129,7 +129,7 @@ GameHub.prototype.run_match_system = function (clients) {
 GameHub.prototype.run_beat_system = function () {
   setInterval(() => {
     this.io.of('/user').emit('beat_req')
-  }, 40000)
+  }, 60000)
 }
 
 GameHub.prototype.init = function (httpserver, options) {
