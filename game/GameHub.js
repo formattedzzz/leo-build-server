@@ -54,9 +54,9 @@ GameHub.prototype.verify_token = function (IO) {
   })
 }
 
-GameHub.prototype.send_to = function (from, to, msg = 'one-to-one message') {
+GameHub.prototype.send_to = function (openid, msg = 'one-to-one message') {
   this.online_clients.forEach((item) => {
-    if (item.socket.id === to) {
+    if (item.openid === openid) {
       console.log('find')
       item.socket.emit('private_msg', {from, msg})
     }
@@ -129,11 +129,6 @@ GameHub.prototype.run_match_system = function (clients) {
 GameHub.prototype.run_beat_system = function () {
   setInterval(() => {
     this.io.of('/user').emit('beat_req')
-    // if (clients && clients.length) {
-    //   clients.forEach((client) => {
-    //     client.socket.send('beat me!')
-    //   })
-    // }
   }, 40000)
 }
 
@@ -183,8 +178,8 @@ GameHub.prototype.init = function (httpserver, options) {
     })
 
     socket.on('update_score', (data) => {
-      let {score, socketid} = data
-      this.send_to(socket.id, socketid, score)
+      let {score, openid} = data
+      this.send_to(openid, score)
     })
 
     this.online_clients.push(socket_obj)
