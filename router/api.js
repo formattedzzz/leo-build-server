@@ -236,10 +236,10 @@ router.get('/get-qarecord', asyncHandler(async function (req, res) {
         where: {
             [OP.or]: [
                 {
-                    record_self: {[OP.like]: `%${req.openid}`}
+                    record_self: {[OP.like]: req.openid}
                 },
                 {
-                    record_match: {[OP.like]: `%${req.openid}`}
+                    record_match: {[OP.like]: req.openid}
                 }
             ]
         }
