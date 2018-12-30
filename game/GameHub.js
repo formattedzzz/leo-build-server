@@ -97,6 +97,7 @@ GameHub.prototype.run_match_system = function (clients) {
   setInterval(() => {
     if (clients.length >= 2) {
       let matchingLength = clients.length % 2 === 0 ? clients.length : clients.length - 1
+      console.log(matchingLength)
       for (let i = 0; i < matchingLength / 2; i++) {
         let VS1 = {
           openid: clients[2 * i].openid,
@@ -115,6 +116,7 @@ GameHub.prototype.run_match_system = function (clients) {
         clients[2 * i + 1].socket.emit('matched', VSdata)
       }
       clients.splice(0, matchingLength)
+      console.log('还剩', this.matching_clients.length)
     } else {
       if (clients.length) {
         clients[0].socket.emit('match_failed')
@@ -124,13 +126,14 @@ GameHub.prototype.run_match_system = function (clients) {
   }, 12000)
 }
 
-GameHub.prototype.run_beat_system = function (clients) {
+GameHub.prototype.run_beat_system = function () {
   setInterval(() => {
-    if (clients && clients.length) {
-      clients.forEach((client) => {
-        client.socket.send('beat me!')
-      })
-    }
+    this.of('/user').emit('beat_req')
+    // if (clients && clients.length) {
+    //   clients.forEach((client) => {
+    //     client.socket.send('beat me!')
+    //   })
+    // }
   }, 40000)
 }
 
@@ -151,8 +154,8 @@ GameHub.prototype.init = function (httpserver, options) {
     let {nickname, avatar} = await UserTable.findOne({where: { openid }})
     debug.log('connected', socket.id, ' ', this.online_clients.length)
 
-    socket.on('message', function (msg) {
-      console.log(msg)
+    socket.on('beat_res', function () {
+      console.log(beat_res)
     })
     let socket_obj = {
       socket,
@@ -168,13 +171,13 @@ GameHub.prototype.init = function (httpserver, options) {
     })
 
     socket.on('cancel_match', () => {
-      console.log(socket.id, ' cancel match', this.matching_clients.length)
+      console.log(socket.id, ' cancel_match')
       this.del_matching_client_byid(socket.id)
       console.log(this.matching_clients.length)
     })
 
     socket.on('disconnect', () => {
-      console.log(socket.id, ' 客户端已经断开连接')
+      console.log(socket.id, ' 断开连接')
       this.del_online_client_byid(socket.id)
       console.log('还有', this.online_clients.length)
     })
