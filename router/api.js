@@ -233,11 +233,11 @@ router.post('/add-qarecord', asyncHandler(async function (req, res) {
 // 获取对战记录
 router.get('/get-qarecord', asyncHandler(async function (req, res) {
     console.log(req.openid)
-    QarecordTable.findAndCountAll({
+    QarecordTable.findAll({
         where: {
-            record_self: {
-                [OP.like]: '%' + req.openid
-            }
+            // record_self: {
+            //     [OP.like]: '%' + req.openid
+            // }
             // [OP.or]: [
             //     {
             //         record_self: {[OP.like]: req.openid}
