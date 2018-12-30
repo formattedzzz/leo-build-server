@@ -99,20 +99,20 @@ GameHub.prototype.run_match_system = function (clients) {
       let matchingLength = clients.length % 2 === 0 ? clients.length : clients.length - 1
       for (let i = 0; i < matchingLength / 2; i++) {
         let VS1 = {
-          openid: clients[i].openid,
-          nickname: clients[i].nickname,
-          socketid: clients[i].socket.id,
-          avatar: clients[i].avatar
+          openid: clients[2 * i].openid,
+          nickname: clients[2 * i].nickname,
+          socketid: clients[2 * i].socket.id,
+          avatar: clients[2 * i].avatar
         }
         let VS2 = {
-          openid: clients[i + 1].openid, 
-          nickname: clients[i + 1].nickname,
-          socketid: clients[i + 1].socket.id,
-          avatar: clients[i + 1].avatar
+          openid: clients[2 * i + 1].openid, 
+          nickname: clients[2 * i + 1].nickname,
+          socketid: clients[2 * i + 1].socket.id,
+          avatar: clients[2 * i + 1].avatar
         }
         let VSdata = [VS1, VS2]
-        clients[i].socket.emit('matched', VSdata)
-        clients[i + 1].socket.emit('matched', VSdata)
+        clients[2 * i].socket.emit('matched', VSdata)
+        clients[2 * i + 1].socket.emit('matched', VSdata)
       }
       clients.splice(0, matchingLength)
     } else {
@@ -128,7 +128,7 @@ GameHub.prototype.run_beat_system = function (clients) {
   setInterval(() => {
     if (clients && clients.length) {
       clients.forEach((client) => {
-        client.socket.send('beats me plz!')
+        client.socket.send('beat me!')
       })
     }
   }, 40000)
@@ -149,16 +149,22 @@ GameHub.prototype.init = function (httpserver, options) {
       return
     }
     let {nickname, avatar} = await UserTable.findOne({where: { openid }})
-    debug.log('one socket connected', socket.id, ' ', openid)
+    debug.log('connected', socket.id, ' ', this.online_clients.length)
 
     socket.on('message', function (msg) {
       console.log(msg)
     })
-
+    let socket_obj = {
+      socket,
+      openid,
+      nickname,
+      avatar,
+      playing: false
+    }
     socket.on('need_match', () => {
-      debug.success(socket.id, ' need match current-length:', this.matching_clients.length)
+      debug.success(socket.id, ' need_match')
       this.matching_clients.push(socket_obj)
-      debug.success(this.matching_clients.length)
+      debug.success('matching-length:', this.matching_clients.length)
     })
 
     socket.on('cancel_match', () => {
@@ -168,9 +174,9 @@ GameHub.prototype.init = function (httpserver, options) {
     })
 
     socket.on('disconnect', () => {
-      console.log(socket.id, ' 客户端已经断开连接 ', this.online_clients.length)
+      console.log(socket.id, ' 客户端已经断开连接')
       this.del_online_client_byid(socket.id)
-      console.log(this.online_clients.length, 'offline')
+      console.log('还有', this.online_clients.length)
     })
 
     socket.on('update_score', (data) => {
@@ -178,13 +184,6 @@ GameHub.prototype.init = function (httpserver, options) {
       this.send_to(socket.id, socketid, score)
     })
 
-    let socket_obj = {
-      socket,
-      openid,
-      nickname,
-      avatar,
-      playing: false
-    }
     this.online_clients.push(socket_obj)
   })
 }
