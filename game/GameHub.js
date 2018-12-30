@@ -155,7 +155,7 @@ GameHub.prototype.init = function (httpserver, options) {
     debug.log('connected', socket.id, ' ', this.online_clients.length)
 
     socket.on('beat_res', function () {
-      console.log(beat_res)
+      console.log('beat_res')
     })
     let socket_obj = {
       socket,
