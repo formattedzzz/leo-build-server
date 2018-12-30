@@ -234,12 +234,12 @@ router.post('/add-qarecord', asyncHandler(async function (req, res) {
 router.get('/get-qarecord', asyncHandler(async function (req, res) {
     QarecordTable.findAndCountAll({
         where: {
-            [Op.or]: [
+            [OP.or]: [
                 {
-                    record_self: {[Op.like]: `%${req.openid}`}
+                    record_self: {[OP.like]: `%${req.openid}`}
                 },
                 {
-                    record_match: {[Op.like]: `%${req.openid}`}
+                    record_match: {[OP.like]: `%${req.openid}`}
                 }
             ]
         }
