@@ -58,7 +58,7 @@ GameHub.prototype.send_to = function (openid, msg = 'one-to-one message') {
   this.online_clients.forEach((item) => {
     if (item.openid === openid) {
       console.log('find')
-      item.socket.emit('private_msg', {from, msg})
+      item.socket.emit('private_msg', {openid, msg})
     }
   })
 }
