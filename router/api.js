@@ -238,14 +238,6 @@ router.get('/get-qarecord', asyncHandler(async function (req, res) {
             record_self: {
                 [OP.regexp]: req.openid
             }
-            // [OP.or]: [
-            //     {
-            //         record_self: {[OP.like]: req.openid}
-            //     },
-            //     {
-            //         record_match: {[OP.like]: req.openid}
-            //     }
-            // ]
         }
     }).then((data) => {
         res.json({
@@ -261,4 +253,5 @@ router.get('/get-qarecord', asyncHandler(async function (req, res) {
         })
     })
 }))
+
 module.exports = router
