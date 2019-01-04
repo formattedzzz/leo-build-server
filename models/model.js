@@ -34,7 +34,7 @@ const UserTable = sequelize.define('user_table', {
  * @param account_type 记账类型 T001: 约会
  * @param account_fund 记账金额
  * @param account_comment 记账备注
- * @param account_time 记账时间
+ * @param account_date 记账时间
  */
 const AccountTable = sequelize.define('account_table', {
   account_id: {
