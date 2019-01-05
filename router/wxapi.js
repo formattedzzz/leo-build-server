@@ -7,14 +7,6 @@ let {UserTable} = require('../models/model.js')
 
 let JWT = require('jsonwebtoken')
 let {secret_key} = require('../config')
-router.get('/admin', function (req, res) {
-    res.json({
-        name: 'xiaolin',
-        age: 22,
-        demo: 'qaq',
-        other: 'lalaland'
-    })
-})
 router.post('/login', function (req, res) {
     // console.log(req.body)
     const {code, encryptedData, iv, signature} = req.body
