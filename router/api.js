@@ -242,7 +242,7 @@ router.get('/get-qarecord', asyncHandler(async function (req, res) {
     }).then((data) => {
         res.json({
             code: 1,
-            data: data,
+            data: data.sort(compare('createdAt')),
             message: '获取对局记录成功'
         })
     }).catch((err) => {

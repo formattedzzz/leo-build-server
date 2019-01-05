@@ -1,5 +1,52 @@
-extends layout
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible", content="ie=edge")
+    title 数据表
+    style.
+      *{
+        padding: 0;
+        margin: 0;
+      }
+      .user-page{
+        background: #eee;
+      }
+      .user-item{
+        padding: 20px;
+        margin: 10px 0;
+        background: #555;
+        font-size: 16px;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .user-item .nickname{
+        font-size: 18px;
+      }
+      .user-item .avatar{
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+      }
+      .user-item .gender{
+        
+      }
+    script(type="text/javascript").
+      console.log('----')
+  body
+    div.user-page
+    each user, index in Users
+      //- - console.log(user.nickname)
+      h5.user-item(style={}) 
+        //- #{JSON.stringify(user, null, 2)}
+        span #{user.id}
+        span.nickname #{user.nickname}
+        span.openid #{user.openid}
+        img.avatar(src='#{user.avatar}')
+        span.gender #{user.gender == 1 ? '男' : (user.gender == 2 ? '女' : '保密')}
+        span.time #{user.createdAt}
 
-block content
-  h1= title
-  p Welcome to #{title}
+
