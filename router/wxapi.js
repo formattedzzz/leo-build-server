@@ -11,7 +11,8 @@ router.get('/admin', function (req, res) {
     res.json({
         name: 'xiaolin',
         age: 22,
-        demo: 'qaq'
+        demo: 'qaq',
+        other: 'lalaland'
     })
 })
 router.post('/login', function (req, res) {
