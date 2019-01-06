@@ -132,6 +132,32 @@ GameHub.prototype.run_beat_system = function () {
   }, 60000)
 }
 
+GameHub.prototype.handle_invite_match = function (inviter, invitee) {
+  let VS1, VS2, idx1, idx2
+  this.online_clients.forEach((client, index) => {
+    if (client.openid === inviter) {
+      VS1 = {
+        openid: client.openid,
+        nickname: client.nickname,
+        socketid: client.socket.id,
+        avatar: client.avatar
+      }
+      idx1 = index
+    }
+    if (client.openid === invitee) {
+      VS2 = {
+        openid: client.openid,
+        nickname: client.nickname,
+        socketid: client.socket.id,
+        avatar: client.avatar
+      }
+      idx2 = index
+    }
+  })
+  this.online_clients[idx1].socket.emit('invite_matched', [VS1, VS2])
+  this.online_clients[idx2].socket.emit('invite_matched', [VS1, VS2])
+}
+
 GameHub.prototype.init = function (httpserver, options) {
   let opts = options || this.getdefaultoptions()
 
@@ -145,6 +171,9 @@ GameHub.prototype.init = function (httpserver, options) {
     if (!openid) {
       socket.emit('system_info', 'authentication error')
       return
+    }
+    if (socket.handshake.query.inviter) {
+      this.handle_invite_match(socket.handshake.query.inviter, openid)
     }
     let {nickname, avatar} = await UserTable.findOne({where: { openid }})
     debug.log('connected', socket.id, ' ', this.online_clients.length)
