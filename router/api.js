@@ -6,6 +6,7 @@ let {AccountTable, QarecordTable} = require('../models/model.js')
 let Sequelize = require('sequelize')
 const OP = Sequelize.Op
 let {formatTime, compare} = require('../utils/tool.js')
+let questions = require('../utils/question.js')
 
 // JWT试验路由 小程序在登录后拿到opened和session_key后下发token 再写一个router.use()中间件
 // if token将解密后的openeid 挂载到req下 next() 否则res.status(403).json({}) 
@@ -254,4 +255,13 @@ router.get('/get-qarecord', asyncHandler(async function (req, res) {
     })
 }))
 
+
+router.get('/get-question', function (req, res) {
+    res.json({
+        code: 1,
+        openid: req.openid,
+        data: questions,
+        message: '获取题目成功'
+    })
+})
 module.exports = router
