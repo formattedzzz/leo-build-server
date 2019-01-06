@@ -10,8 +10,13 @@ let asyncHandler = require('express-async-handler')
 // let request = require('request')
 // let Sequelize = require('sequelize')
 
-router.get('/index', asyncHandler(async function(req, res, next){
+router.get('/index', asyncHandler(async function(req, res){
   let Users = await UserTable.findAll()
   res.render('index', {Users})
+  // res.json({
+  //   code: 1,
+  //   users: Users,
+  //   message: '获取用户列表成功'
+  // })
 }))
 module.exports = router
