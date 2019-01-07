@@ -157,8 +157,7 @@ GameHub.prototype.init = function (httpserver, options) {
       socket,
       openid,
       nickname,
-      avatar,
-      playing: false
+      avatar
     }
     socket.on('need_match', () => {
       debug.success(socket.id, ' need_match')
@@ -182,24 +181,18 @@ GameHub.prototype.init = function (httpserver, options) {
       let {score, openid} = data
       this.send_to(openid, score)
     })
-    socket.on('fill_invite', (inviter_openid) => {
-      let invitor = this.find_client_byid(inviter_openid)
-      if (invitor) {
-        let VS1 = {
-          openid: invitor.openid,
-          nickname: invitor.nickname,
-          avatar: invitor.avatar
-        }
-        let VS2 = {
-          openid,
-          nickname,
-          avatar
-        }
-        invitor.socket.emit('invite_matched', [VS1, VS2])
-        socket.emit('invite_matched', [VS1, VS2])
+    socket.on('join_room', (roominfo) => {
+      socket.join(roominfo.room)
+      // if (!roominfo.init) {
+      socket.to(roominfo.room).emit('join_info', 'someone joined')
+      // }
+    })
+    socket.on('exit_room', (roominfo) => {
+      socket.leave(roominfo.room)
+      if (roominfo.init) {
+        socket.to(roominfo.room).emit('exit_info', 'landlord leave')
       } else {
-        // 邀请者已经掉线
-        socket.emit('invite_matched_fail', '你的好友已离线')
+        socket.to(roominfo.room).emit('exit_info', 'someone leave')
       }
     })
     this.online_clients.push(socket_obj)
