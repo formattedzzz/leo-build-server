@@ -199,7 +199,8 @@ GameHub.prototype.init = function (httpserver, options) {
       socket.join(roominfo.room)
       // socket.to(roominfo.room).emit('join_info', 'someone joined')
       let room_info = this.get_room_info('/user', roominfo.room)
-      this.io.of('/user').in(roominfo.room).emit('join_info', room_info)
+      console.log(room_info)
+      socket.in(roominfo.room).emit('join_info', room_info)
     })
     socket.on('exit_room', (roominfo) => {
       socket.leave(roominfo.room)
