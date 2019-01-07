@@ -131,7 +131,21 @@ GameHub.prototype.run_beat_system = function () {
     this.io.of('/user').emit('beat_req')
   }, 60000)
 }
-
+GameHub.prototype.get_room_info = function (namespace, roomname) {
+  let roomarr
+  this.io.of(namespace).in(roomname).clients((err, client) => {
+    if (!err) {
+      let clientobj = this.find_client_byid(client)
+      roomarr.push({
+        openid: clientobj.openid,
+        socketid: clientobj.socket.id,
+        nickname: clientobj.nickname,
+        avatar: clientobj.avatar
+      })
+    }
+  })
+  return roomarr
+}
 
 GameHub.prototype.init = function (httpserver, options) {
   let opts = options || this.getdefaultoptions()
@@ -183,16 +197,16 @@ GameHub.prototype.init = function (httpserver, options) {
     })
     socket.on('join_room', (roominfo) => {
       socket.join(roominfo.room)
-      // if (!roominfo.init) {
-      socket.to(roominfo.room).emit('join_info', 'someone joined')
-      // }
+      // socket.to(roominfo.room).emit('join_info', 'someone joined')
+      let room_info = this.get_room_info('/user', roominfo.room)
+      this.io.of('/user').in(roominfo.room).emit('join_info', room_info)
     })
     socket.on('exit_room', (roominfo) => {
       socket.leave(roominfo.room)
       if (roominfo.init) {
-        socket.to(roominfo.room).emit('exit_info', 'landlord leave')
+        socket.to(roominfo.room).emit('exit_info', {init: true})
       } else {
-        socket.to(roominfo.room).emit('exit_info', 'someone leave')
+        socket.to(roominfo.room).emit('exit_info', {init: false, socketid: socket.id})
       }
     })
     this.online_clients.push(socket_obj)
