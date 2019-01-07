@@ -21,6 +21,16 @@ let LEO = {
         }
       })
     })
+  },
+  map_client: function (arr) {
+    return arr.map((item) => {
+      return {
+        openid: item.openid,
+        socketid: item.socket.id,
+        nickname: item.nickname,
+        avatar: item.avatar
+      }
+    })
   }
 }
 
@@ -28,6 +38,7 @@ function GameHub () {
   this.rooms = []
   this.online_clients = []
   this.matching_clients = []
+  this.ROOMS = {}
 }
 
 GameHub.prototype.getdefaultoptions = function () {
@@ -79,11 +90,17 @@ GameHub.prototype.del_matching_client_byid = function (id = '') {
   })
 }
 
-GameHub.prototype.find_client_byid = function (id = '') {
+GameHub.prototype.find_client_byid = function (type='socketid', id = '') {
   let client = null
   this.online_clients.forEach((item, index) => {
-    if (item.openid === id) {
-      client = item
+    if (type === 'openid') {
+      if (item.openid === id) {
+        client = item
+      }
+    } else {
+      if (item.socket.id === id) {
+        client = item
+      }
     }
   })
   if (client) {
@@ -131,31 +148,42 @@ GameHub.prototype.run_beat_system = function () {
     this.io.of('/user').emit('beat_req')
   }, 60000)
 }
-GameHub.prototype.get_room_info = function (namespace, roomname) {
-  let roomarr
-  this.io.of(namespace).in(roomname).clients((err, client) => {
-    if (!err) {
-      let clientobj = this.find_client_byid(client)
-      roomarr.push({
-        openid: clientobj.openid,
-        socketid: clientobj.socket.id,
-        nickname: clientobj.nickname,
-        avatar: clientobj.avatar
-      })
-    }
-  })
-  return roomarr
-}
+// GameHub.prototype.get_room_info = function (namespace, roomname) {
+//   let temp = []
+//   console.log(1)
+//   this.io.of(namespace).in(roomname).clients((err, client) => {
+//     if (!err && client.length) {
+//       console.log(2)
+//       client.forEach((item, index) => {
+//         let obj = this.find_client_bysocketid(item)
+//         let mate = {
+//           openid: obj.openid,
+//           socketid: obj.socket.id,
+//           nickname: obj.nickname,
+//           avatar: obj.avatar
+//         }
+//         console.log(3)
+//         temp.push(mate)
+//       })
+//     }
+//   })
+//   console.log(4)
+//   console.log(temp)
+//   return temp
+// }
 
 GameHub.prototype.init = function (httpserver, options) {
   let opts = options || this.getdefaultoptions()
 
   this.io = IO(httpserver)
+  // this.io.set('heartbeat interval', 20)
+  // this.io.set('heartbeat timeout', 30)
   this.verify_token(this.io)
   this.run_match_system(this.matching_clients)
   this.run_beat_system(this.online_clients)
 
   this.io.of('/user').on('connection', async (socket) => {
+    socket.on('beat_res', () => {})  //接受心跳包
     let openid = await LEO.get_openid(socket.handshake.query.token)
     if (!openid) {
       socket.emit('system_info', 'authentication error')
@@ -163,10 +191,7 @@ GameHub.prototype.init = function (httpserver, options) {
     }
     let {nickname, avatar} = await UserTable.findOne({where: { openid }})
     debug.log('connected', socket.id, ' ', this.online_clients.length)
-
-    socket.on('beat_res', function () {
-      console.log('beat_res')
-    })
+    
     let socket_obj = {
       socket,
       openid,
@@ -196,18 +221,55 @@ GameHub.prototype.init = function (httpserver, options) {
       this.send_to(openid, score)
     })
     socket.on('join_room', (roominfo) => {
-      socket.join(roominfo.room)
+      // socket.join(roominfo.room)
       // socket.to(roominfo.room).emit('join_info', 'someone joined')
-      let room_info = this.get_room_info('/user', roominfo.room)
-      console.log(room_info)
-      socket.in(roominfo.room).emit('join_info', room_info)
+      // let room_info = this.get_room_info('/user', roominfo.room)
+      let join_info_data
+      let thisroom = this.ROOMS[roominfo.room]
+      if (!thisroom && !roominfo.init) {
+        socket.emit('join_fail', '房主已离线，房间无效')
+        return
+      }
+      if (thisroom && thisroom.length > 5) {
+        socket.emit('join_fail', '人员已满')
+        return
+      }
+      if (thisroom && thisroom.length) {
+        thisroom.push(socket_obj)
+        join_info_data = LEO.map_client(thisroom)
+        thisroom.forEach((item) => {
+          item.socket.emit('join_info', join_info_data)
+        })
+        // this.io.of('/user').in(roominfo.room).emit('join_info', join_info_data)
+      } else {
+        this.ROOMS[roominfo.room] = [socket_obj]
+        join_info_data = LEO.map_client(this.ROOMS[roominfo.room])
+        this.ROOMS[roominfo.room].forEach((item) => {
+          item.socket.emit('join_info', join_info_data)
+        })
+        // this.io.of('/user').in(roominfo.room).emit('join_info', join_info_data)
+      }
     })
     socket.on('exit_room', (roominfo) => {
-      socket.leave(roominfo.room)
       if (roominfo.init) {
-        socket.to(roominfo.room).emit('exit_info', {init: true})
+        console.log('房主离线')
+        this.ROOMS[roominfo.room].forEach((item) => {
+          item.socket.emit('exit_info', {init: true})
+        })
+        delete this.ROOMS[roominfo.room]
       } else {
-        socket.to(roominfo.room).emit('exit_info', {init: false, socketid: socket.id})
+        let thisroom = this.ROOMS[roominfo.room]
+        thisroom.forEach((item, index) => {
+          if (item.socket.id === socket.id) {
+            thisroom.splice(index, 1)
+          }
+        })
+        this.ROOMS[roominfo.room].forEach((item) => {
+          item.socket.emit('exit_info', {
+            init: false,
+            leftrooms: LEO.map_client(this.ROOMS[roominfo.room])
+          })
+        })
       }
     })
     this.online_clients.push(socket_obj)
