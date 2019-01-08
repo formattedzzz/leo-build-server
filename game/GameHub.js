@@ -272,6 +272,18 @@ GameHub.prototype.init = function (httpserver, options) {
         })
       }
     })
+    socket.on('req_begin', (roomname) => {
+      this.ROOMS[roomname].forEach((mate) => {
+        mate.socket.emit('diss_begin')
+      })
+    })
+    socket.on('room_msg', (msginfo) => {
+      this.ROOMS[msginfo.roomname].forEach((mate) => {
+        if (mate.openid != msginfo.openid) {
+          mate.socket.emit('room_msg', msginfo.msg)
+        }
+      })
+    })
     this.online_clients.push(socket_obj)
   })
 }
