@@ -280,7 +280,10 @@ GameHub.prototype.init = function (httpserver, options) {
     socket.on('room_msg', (msginfo) => {
       this.ROOMS[msginfo.roomname].forEach((mate) => {
         if (mate.openid != msginfo.openid) {
-          mate.socket.emit('room_msg', msginfo.msg)
+          mate.socket.emit('room_msg', {
+            from: msginfo.openid,
+            msg: msginfo.msg
+          })
         }
       })
     })
