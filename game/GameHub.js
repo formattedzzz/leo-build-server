@@ -225,6 +225,7 @@ GameHub.prototype.init = function (httpserver, options) {
       // socket.to(roominfo.room).emit('join_info', 'someone joined')
       // let room_info = this.get_room_info('/user', roominfo.room)
       let join_info_data
+      
       let thisroom = this.ROOMS[roominfo.room]
       if (!thisroom && !roominfo.init) {
         socket.emit('join_fail', '房主已离线，房间无效')
@@ -235,7 +236,13 @@ GameHub.prototype.init = function (httpserver, options) {
         return
       }
       if (thisroom && thisroom.length) {
-        thisroom.push(socket_obj)
+        let is_inroom
+        is_inroom = thisroom.some((item) => {
+          return item.openid === openid
+        })
+        if (!is_inroom) {
+          thisroom.push(socket_obj) // 已经在房间中
+        }
         join_info_data = LEO.map_client(thisroom)
         thisroom.forEach((item) => {
           item.socket.emit('join_info', join_info_data)
