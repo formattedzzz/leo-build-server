@@ -333,9 +333,9 @@ router.get('/shulte/get-rank', function (req, res) {
                 score: item.shulte,
                 avatar: item.avatar,
                 nickname: item.nickname,
-                hard3: item.shulte.split('-')[0],
-                hard4: item.shulte.split('-')[1],
-                hard5: item.shulte.split('-')[2]
+                hard3: Number(item.shulte.split('-')[0]),
+                hard4: Number(item.shulte.split('-')[1]),
+                hard5: Number(item.shulte.split('-')[2])
             }
         }).filter((item) => {
             if (self) {

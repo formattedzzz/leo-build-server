@@ -289,7 +289,8 @@ GameHub.prototype.init = function (httpserver, options) {
         if (mate.openid != msginfo.openid) {
           mate.socket.emit('room_msg', {
             from: msginfo.openid,
-            msg: msginfo.msg
+            msg: msginfo.msg,
+            nickname: msginfo.nickname
           })
         }
       })
