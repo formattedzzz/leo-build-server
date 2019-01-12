@@ -24,6 +24,9 @@ const UserTable = sequelize.define('user_table', {
   },
   city: {
     type: Sequelize.STRING
+  },
+  shulte: {
+    type: Sequelize.STRING
   }
 });
 // -------------------------------------------记账记录总表

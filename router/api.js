@@ -2,7 +2,7 @@ let express = require('express')
 let router = express.Router()
 let asyncHandler = require('express-async-handler')
 let uuidv1 = require('uuid/v1')
-let {AccountTable, QarecordTable} = require('../models/model.js')
+let {AccountTable, QarecordTable, UserTable} = require('../models/model.js')
 let Sequelize = require('sequelize')
 const OP = Sequelize.Op
 let {formatTime, compare} = require('../utils/tool.js')
@@ -17,6 +17,7 @@ router.get('/openid', asyncHandler(async function (req, res) {
         message: '获取opened成功'
     })
 }))
+
 // 修改记账
 router.put('/edit-account', asyncHandler(async function (req, res) {
     let {
@@ -256,13 +257,105 @@ router.get('/get-qarecord', asyncHandler(async function (req, res) {
     })
 }))
 
-
+// 获取题目
 router.get('/get-question', function (req, res) {
     res.json({
         code: 1,
-        openid: req.openid,
         data: questions,
         message: '获取题目成功'
     })
 })
+
+// 更新方格游戏记录
+router.post('/shulte/update-score', asyncHandler(async function (req, res) {
+    let openid = req.openid
+    let {score, hard} = req.body
+    if (!score || !hard) {
+        res.status(401).json({
+            code: 0,
+            data: null,
+            message: '参数不合法'
+        })
+    }
+    let targetStr = ''
+    let userinfo = await UserTable.findOne({
+        where: {
+            openid
+        }
+    })
+    if (userinfo.shulte) {
+        let arr = userinfo.shulte.split('-')
+        if (Number(arr[hard - 3]) === 0) {
+            arr[hard - 3] = score
+        } else if (Number(score) < Number(arr[hard - 3])) {
+            arr[hard - 3] = score
+        }
+        targetStr = arr.join('-')
+    } else {
+        let arr = new Array(3).fill(0)
+        arr[hard - 3] = score
+        targetStr = arr.join('-')
+    }
+    console.log(targetStr)
+    UserTable.update(
+        {
+            shulte: targetStr
+        },
+        {where: { openid }}
+    ).then(() => {
+        res.json({
+            code: 1,
+            data: 'null',
+            message: '更新成功'
+        })
+    }).catch((err) => {
+        res.status(500).json({
+            code: 0,
+            data: err,
+            message: JSON.stringify(err)
+        })
+    })
+}))
+
+// 获取排行
+router.get('/shulte/get-rank', function (req, res) {
+    let self = req.query.self
+    UserTable.findAll({
+        where: {
+            shulte: {
+                [OP.ne]: null
+            }
+        }
+    }).then((resarr) => {
+        let data = resarr.map((item) => {
+            return {
+                openid: item.openid,
+                score: item.shulte,
+                avatar: item.avatar,
+                nickname: item.nickname,
+                hard3: item.shulte.split('-')[0],
+                hard4: item.shulte.split('-')[1],
+                hard5: item.shulte.split('-')[2]
+            }
+        }).filter((item) => {
+            if (self) {
+                return item.openid === req.openid
+            } else {
+                return true
+            }
+        })
+        res.json({
+            code: 1,
+            data: data,
+            message: '获取成功'
+        })
+    }).catch((err) => {
+        res.status(500).json({
+            code: 0,
+            data: err,
+            message: JSON.stringify(err)
+        })
+    })
+})
+
 module.exports = router
