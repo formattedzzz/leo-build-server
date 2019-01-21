@@ -148,29 +148,6 @@ GameHub.prototype.run_beat_system = function () {
     this.io.of('/user').emit('beat_req')
   }, 60000)
 }
-// GameHub.prototype.get_room_info = function (namespace, roomname) {
-//   let temp = []
-//   console.log(1)
-//   this.io.of(namespace).in(roomname).clients((err, client) => {
-//     if (!err && client.length) {
-//       console.log(2)
-//       client.forEach((item, index) => {
-//         let obj = this.find_client_bysocketid(item)
-//         let mate = {
-//           openid: obj.openid,
-//           socketid: obj.socket.id,
-//           nickname: obj.nickname,
-//           avatar: obj.avatar
-//         }
-//         console.log(3)
-//         temp.push(mate)
-//       })
-//     }
-//   })
-//   console.log(4)
-//   console.log(temp)
-//   return temp
-// }
 
 GameHub.prototype.init = function (httpserver, options) {
   let opts = options || this.getdefaultoptions()

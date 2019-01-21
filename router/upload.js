@@ -13,6 +13,7 @@ router.get('*', function (req, res) {
     const stat = fs.statSync(path)
     const fileSize = stat.size
     const range = req.headers.range
+    // console.log(req.headers)
     if (range) {
       const parts = range.replace(/bytes=/, "").split("-")
       const start = parseInt(parts[0], 10)
@@ -28,7 +29,6 @@ router.get('*', function (req, res) {
         'Content-Length': chunksize,
         'Content-Type': 'video/mp4',
       }
-  
       res.writeHead(206, head)
       file.pipe(res)
     } else {
