@@ -35,10 +35,10 @@ let LEO = {
 }
 
 function GameHub () {
-  this.rooms = []
   this.online_clients = []
   this.matching_clients = []
   this.ROOMS = {}
+  this.msgbox = {}
 }
 
 GameHub.prototype.getdefaultoptions = function () {
@@ -64,14 +64,36 @@ GameHub.prototype.verify_token = function (IO) {
     })
   })
 }
-
-GameHub.prototype.send_to = function (openid, msg = 'one-to-one message') {
+// 献给答题页面用着
+GameHub.prototype.update_score = function (openid, msg = 'score is 20') {
   this.online_clients.forEach((item) => {
     if (item.openid === openid) {
-      console.log('find')
-      item.socket.emit('private_msg', {openid, msg})
+      item.socket.emit('update_score', {openid, msg})
     }
   })
+}
+
+GameHub.prototype.prtivate_msg = function (from, to, data={}) {
+  let fromobj = this.find_client_byid(from)
+  let toobj = this.find_client_byid(to)
+  if (toobj) {
+    toobj.socket.emit('private_msg', Object.assign(data, {
+      from: {
+        nickname: fromobj.nickname,
+        avatar: fromobj.avatar,
+        openid: fromobj.openid
+      }
+    }))
+  } else {
+    this.msgbox[to] = []
+    this.msgbox[to].push(Object.assign(data, {
+      from: {
+        nickname: fromobj.nickname,
+        avatar: fromobj.avatar,
+        openid: fromobj.openid
+      }
+    }))
+  }
 }
 
 GameHub.prototype.del_online_client_byid = function (id = '') {
@@ -90,17 +112,11 @@ GameHub.prototype.del_matching_client_byid = function (id = '') {
   })
 }
 
-GameHub.prototype.find_client_byid = function (type='socketid', id = '') {
+GameHub.prototype.find_client_byid = function (openid = '') {
   let client = null
   this.online_clients.forEach((item, index) => {
-    if (type === 'openid') {
-      if (item.openid === id) {
-        client = item
-      }
-    } else {
-      if (item.socket.id === id) {
-        client = item
-      }
+    if (item.openid === openid) {
+      client = item
     }
   })
   if (client) {
@@ -133,7 +149,7 @@ GameHub.prototype.run_match_system = function (clients) {
         clients[2 * i + 1].socket.emit('matched', VSdata)
       }
       clients.splice(0, matchingLength)
-      console.log('匹配了' + matchingLength + '人,还剩', this.matching_clients.length)
+      // console.log('匹配了' + matchingLength + '人,还剩', this.matching_clients.length)
     } else {
       if (clients.length) {
         clients[0].socket.emit('match_failed')
@@ -182,25 +198,18 @@ GameHub.prototype.init = function (httpserver, options) {
     })
 
     socket.on('cancel_match', () => {
-      console.log(socket.id, ' cancel_match')
       this.del_matching_client_byid(socket.id)
-      console.log(this.matching_clients.length)
     })
 
     socket.on('disconnect', () => {
-      console.log(socket.id, ' 断开连接')
       this.del_online_client_byid(socket.id)
-      console.log('还有', this.online_clients.length)
     })
 
     socket.on('update_score', (data) => {
       let {score, openid} = data
-      this.send_to(openid, score)
+      this.update_score(openid, score)
     })
     socket.on('join_room', (roominfo) => {
-      // socket.join(roominfo.room)
-      // socket.to(roominfo.room).emit('join_info', 'someone joined')
-      // let room_info = this.get_room_info('/user', roominfo.room)
       let join_info_data
       
       let thisroom = this.ROOMS[roominfo.room]
@@ -224,19 +233,17 @@ GameHub.prototype.init = function (httpserver, options) {
         thisroom.forEach((item) => {
           item.socket.emit('join_info', join_info_data)
         })
-        // this.io.of('/user').in(roominfo.room).emit('join_info', join_info_data)
       } else {
         this.ROOMS[roominfo.room] = [socket_obj]
         join_info_data = LEO.map_client(this.ROOMS[roominfo.room])
         this.ROOMS[roominfo.room].forEach((item) => {
           item.socket.emit('join_info', join_info_data)
         })
-        // this.io.of('/user').in(roominfo.room).emit('join_info', join_info_data)
       }
     })
     socket.on('exit_room', (roominfo) => {
       if (roominfo.init) {
-        console.log('房主离线')
+        // console.log('房主离线')
         this.ROOMS[roominfo.room].forEach((item) => {
           item.socket.emit('exit_info', {init: true})
         })
@@ -271,6 +278,40 @@ GameHub.prototype.init = function (httpserver, options) {
           })
         }
       })
+    })
+    socket.on('private_msg', (msginfo={}) => {
+      this.prtivate_msg(msginfo.from, msginfo.to, msginfo.data)
+    })
+    // 处理缓存的消息
+    let msgbox = this.msgbox[socket_obj.openid]
+    if (msgbox && msgbox.length) {
+      msgbox.forEach((msg) => {
+        socket_obj.socket.emit('private_msg', msg)
+      })
+      msgbox = []
+    }
+    this.online_clients.push(socket_obj)
+  })
+
+  this.io.of('/leo').on('connection', async (socket) => {
+    socket.on('beat_res', () => {})  //接受心跳包
+    let openid = await LEO.get_openid(socket.handshake.query.token)
+    if (!openid) {
+      socket.emit('system_info', 'authentication error')
+      return
+    }
+    let {nickname, avatar} = await UserTable.findOne({where: { openid }})
+    debug.log('connected', socket.id, ' ', this.online_clients.length)
+    
+    let socket_obj = {
+      socket,
+      openid,
+      nickname,
+      avatar
+    }
+    socket.on('disconnect', () => {
+      console.log(socket.id, ' 断开连接')
+      this.del_online_client_byid(socket.id)
     })
     this.online_clients.push(socket_obj)
   })
