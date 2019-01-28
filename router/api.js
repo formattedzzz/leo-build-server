@@ -2,7 +2,7 @@ let express = require('express')
 let router = express.Router()
 let asyncHandler = require('express-async-handler')
 let uuidv1 = require('uuid/v1')
-let {AccountTable, QarecordTable, UserTable} = require('../models/model.js')
+let {AccountTable, QarecordTable, UserTable, ImageTable} = require('../models/model.js')
 let Sequelize = require('sequelize')
 const OP = Sequelize.Op
 let {formatTime, compare} = require('../utils/tool.js')
@@ -354,6 +354,33 @@ router.get('/shulte/get-rank', function (req, res) {
             code: 0,
             data: err,
             message: JSON.stringify(err)
+        })
+    })
+})
+
+// 获取相册
+router.get('/get-album', function (req, res) {
+    ImageTable.findOne({
+        where: {openid: req.openid}
+    }).then((info) => {
+        if (info && info.dataValues) {
+            res.json({
+                code: 1,
+                data: info.dataValues.patharr,
+                message: '获取相册成功'
+            })
+        } else {
+            res.json({
+                code: 1,
+                data: '',
+                message: '你还没有相册'
+            })
+        }
+    }).catch((err) => {
+        res.json({
+            code: 0,
+            data: err,
+            message: '获取相册失败'
         })
     })
 })

@@ -3,6 +3,49 @@ let router = express.Router()
 let path = require('path')
 let fs = require('fs')
 let multiparty = require('multiparty')
+let {ImageTable} = require('../models/model.js')
+const imagemin = require('imagemin')
+const imageminJpegtran = require('imagemin-jpegtran')
+const imageminPngquant = require('imagemin-pngquant')
+
+function postImgInfo(openid, imgpath) {
+  ImageTable.findOne({
+    where: {openid}
+  }).then((info) => {
+    if (info) {
+      if (/^\[[\S\s]+\]$/.test(info.dataValues.patharr)) {
+        ImageTable.update(
+          {
+            patharr: JSON.stringify(JSON.parse(info.dataValues.patharr).concat([imgpath]))
+          },
+          {
+            where: {openid}
+          }
+        ).then((res) => {
+          console.log('老用户imgOK！')
+        })
+      } else {
+        ImageTable.update(
+          {
+            patharr: JSON.stringify([imgpath])
+          },
+          {
+            where: {openid}
+          }
+        ).then((res) => {
+          console.log('老用户imgOK！')
+        })
+      }
+    } else {
+      ImageTable.create({
+        openid,
+        patharr: JSON.stringify([imgpath])
+      }).then((res) => {
+        console.log('新用户imgOK！')
+      })
+    }
+  })
+}
 
 router.get('*', function (req, res) {
   let pathurl = req.path
@@ -85,20 +128,25 @@ router.post('/video', function (req, res) {
 })
 
 router.post('/image', function (req, res) {
-  // console.log(Object.keys(req))
-  // let {rawHeaders, body, params, headers } = req
+  let openid = req.openid
+  let imgname = req.headers['name']
+  if (typeof imgname === 'string' || typeof imgname === 'number') {
+    imgname = [imgname + '']
+  } else {
+    imgname = Array.isArray(imgname) ? imgname : []
+  }
   var form = new multiparty.Form({
     encoding: 'utf8',
     maxFilesSize: 10 * 1024 * 1024,
     autoFiles: true,
-    uploadDir: 'upload/image'
+    uploadDir: 'upload/rawimage'
   })
   form.parse(req, function (err, fields, files) {
     if (err) {
       console.log('parse error: ' + err)
       res.status(500).json({
         code: 0,
-        message: '解析失败，可能为upload路径不对！',
+        message: '解析失败，可能为upload路径不对',
         path: ''
       })
       return
@@ -110,62 +158,79 @@ router.post('/image', function (req, res) {
       })
       return
     }
-    // console.log(files)
-    // files 数据格式：
+    /**  数据格式：files ===  */
     // {
-    //   fieldName: 'image',
-    //   originalFilename: 'temppath...',
-    //   path: 'upload/image/...',
-    //   Headers: {
-    //     'content-type': 'image/type',
-    //     'content-disposition': 'form-data; name="image";filename="..."'
-    //   },
-    //   size: 31034524
+    //   image: [
+    //     {
+    //       fieldName: 'image',
+    //       originalFilename: 'wxb44a677abfabfc2c.o6zAJs0hmuK9PI-CnGJV9ElP7Pe4.LRu6ASTuu1y4750dacc63e5fb6ad893f430be14b5db0.png',
+    //       path: 'upload/image/FD5TXWuOqZ16AX6SwklXo7yW.png',
+    //       Headers: {
+    //         'content-type': 'image/type',
+    //         'content-disposition': 'form-data; name="image";filename="..."'
+    //       },
+    //       size: 310524
+    //     }
+    //   ]
     // }
-    console.log(files)
-    let pathArr = files.image.map((item, index) => {
-      return '/' + item.path.replace(/\\/g, '/')
+    let pathArr = files.image.map((item) => {
+      return item.path.replace(/\\/g, '/')
     })
-    res.json({
-      code: 1,
-      message: '图片上传成功',
-      path: pathArr
+    imagemin(
+      pathArr,
+      // ['upload/rawimage/Dfw9GZI2DmlveGfnlk9vpmS4.png'],
+      'upload/image',
+      {
+        use: [
+          imageminJpegtran(),
+          imageminPngquant({
+            quality: [0.6, 0.8]
+          })
+        ]
+      }
+    ).then((data) => {
+      let miniPathArr = data.map(img => img.path)
+      if (imgname.length === miniPathArr.length) {
+        miniPathArr.forEach((minipath, index) => {
+          if (imgname[index]) {
+            let oldpath = path.resolve(__dirname, '../', minipath)
+            let type = /\.(\w+)$/.exec(minipath) ? /\.(\w+)$/.exec(minipath)[0] : ''
+            let newpath = path.resolve(__dirname, '../', `upload/image/${imgname[index]}${type}`)
+            fs.renameSync(oldpath, newpath)
+            let imginfo = fs.statSync(newpath)
+            miniPathArr[index] = {
+              path: `/upload/image/${imgname[index]}${type}`,
+              size: imginfo.size
+            }
+            if (openid) {
+              postImgInfo(openid, `/upload/image/${imgname[index]}${type}`)
+            }
+          }
+        })
+      }
+      console.log(miniPathArr)
+      res.json({
+        code: 1,
+        message: '图片处理成功',
+        pathArr: miniPathArr
+      })
+      pathArr.forEach((item, index) => {
+        let delpath = path.resolve(__dirname, '../', item)
+        if (fs.existsSync(delpath)) {
+          fs.unlinkSync(delpath)
+        }
+      })
+    }).catch((err) => {
+      console.log(err)
+      res.json({
+        code: 1,
+        message: '图片处理失败',
+        pathArr: [],
+        err: err
+      })
     })
 
   })
 })
 
-module.exports = router    
-    // let promiseArr = []
-    // let resSemiSrc = []
-    // files.image.forEach((item) => {
-    //   var uploadedPath = path.resolve(__dirname, '../', item.path) // 经过multiparty处理的路径
-    //   var realPath = path.resolve(__dirname, '../upload/image/' + item.originalFilename) // 真实文件名产生的路径
-    //   resSemiSrc.push(path.resolve('/upload/image/' + item.originalFilename))// 返回前端一半的目标路径
-    //   // 重命名为真实文件名
-    //   promiseArr.push(new Promise(function (resolve, reject) {
-    //     fs.rename(uploadedPath, realPath, function (err) {
-    //       if (err) {
-    //         console.log('rename error: ' + err)
-    //         reject('failed')
-    //       } else {
-    //         console.log('rename ok')
-    //         resolve('success')
-    //       }
-    //     })
-    //   }))
-    // })
-    // Promise.all(promiseArr).then(function (result) {
-    //   // fs.readFileSync(path).toString('base64') // 返回base64编码的图片
-    //   res.json({
-    //     code: 1,
-    //     message: '图片上传成功',
-    //     path: resSemiSrc
-    //   })
-    // }).catch(function (err) {
-    //   console.log(err)
-    //   res.json({
-    //     code: 0,
-    //     message: '图片上传失败'
-    //   })
-    // })
+module.exports = router

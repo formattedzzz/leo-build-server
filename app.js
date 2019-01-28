@@ -65,7 +65,7 @@ app.all('*', function (req, res, next) {
 })
 
 // 业务路由获取openid及解决跨域问题中间件
-app.all('/api/*', asyncHandler(async function (req, res, next) {
+let openid_controller = asyncHandler(async function (req, res, next) {
   res.header('Content-Type', 'application/json;charset=utf-8')
   let token = req.headers['token']
   if (token) {
@@ -88,7 +88,12 @@ app.all('/api/*', asyncHandler(async function (req, res, next) {
     return
   }
   next()
-}));
+});
+app.all('/api/*', openid_controller);
+app.all('/upload/*', function (req, res, next) {
+  req.openid = req.headers['openid']
+  next()
+});
 // 错误捕获中间件 这里捕获的不是逻辑上会走的错误，而是代码语法上的错误 
 // 比如说 var arr = null 而你在代码中访问了arr.length
 app.use(function (err, req, res, next) {

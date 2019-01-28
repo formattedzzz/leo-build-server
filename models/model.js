@@ -114,8 +114,25 @@ const QarecordTable = sequelize.define('qarecord_table', {
   }
 });
 
+// ------------------------------------------答题记录表
+/**
+ * @param openid openid
+ * @param patharr 路径数组
+ */
 
-[UserTable, AccountTable, AccountTypeTable, QarecordTable].forEach((item, index) => {
+const ImageTable = sequelize.define('image_table', {
+  openid: {
+    type: Sequelize.STRING,
+    primaryKey: true
+  },
+  patharr: {
+    type: Sequelize.TEXT,
+    defaultValue: '[]'
+  }
+});
+
+
+[UserTable, AccountTable, AccountTypeTable, QarecordTable, ImageTable].forEach((item, index) => {
   item.sync({ alter: true })
   .then(() => {
     console.log(`${item.tableName} is already.`)
@@ -128,50 +145,7 @@ module.exports = {
   UserTable,
   AccountTable,
   AccountTypeTable,
-  QarecordTable
+  QarecordTable,
+  ImageTable
 }
-// bbb()
-// SessionTable.findOne({where: {openid: 'openid'}}).then((res)=>{
-//   console.log(res.get('sessionid'))
-// })
-// SessionTable.sync()
-// SessionTable.create({
-//   session_key: 'session_key',
-//   openid: 'openid',
-//   sessionid: 'session_key' + 'openid'
-// })
-// .then((res)=>{
-//   console.log('inserted ok!')
-// })
-// .catch(function(err){
-//   console.log('inserted error');
-//   console.log(err.message)
-// })
-// const User = sequelize.define('user_table', {
-//   name: Sequelize.STRING,
-//   email: Sequelize.STRING
-// })
-// const Project = sequelize.define('project_table', {
-//   name: Sequelize.STRING,
-//   fund: Sequelize.BIGINT,
-//   other: Sequelize.STRING
-// })
-// Project.belongsTo(User, {foreignKey: 'user_id'})
-// User.sync()
-// Project.sync()
 
-// User.create({
-//   name: 'xiaolin',
-//   email: '614791110@qq.com'
-// })
-// .then((res)=>{
-//   console.log('inserted ok!')
-// })
-// Project.create({
-//   name: 'nncz',
-//   fund: 1000000,
-//   user_id: 1
-// })
-// .then((res)=>{
-//   console.log('inserted ok too!')
-// })
