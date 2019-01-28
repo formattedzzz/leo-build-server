@@ -9,6 +9,7 @@ const imageminJpegtran = require('imagemin-jpegtran')
 const imageminPngquant = require('imagemin-pngquant')
 
 function postImgInfo(openid, imgpath) {
+  // findOne 要对查询结果做判断
   ImageTable.findOne({
     where: {openid}
   }).then((info) => {
