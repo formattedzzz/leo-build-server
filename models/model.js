@@ -127,7 +127,7 @@ const ImageTable = sequelize.define('image_table', {
   },
   patharr: {
     type: Sequelize.TEXT,
-    defaultValue: '[]'
+    defaultValue: ''
   }
 });
 

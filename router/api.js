@@ -1,4 +1,6 @@
 let express = require('express')
+let fs = require('fs')
+let path = require('path')
 let router = express.Router()
 let asyncHandler = require('express-async-handler')
 let uuidv1 = require('uuid/v1')
@@ -371,16 +373,80 @@ router.get('/get-album', function (req, res) {
             })
         } else {
             res.json({
-                code: 1,
-                data: '',
+                code: 0,
+                data: null,
                 message: '你还没有相册'
             })
         }
     }).catch((err) => {
         res.json({
             code: 0,
-            data: err,
+            data: null,
             message: '获取相册失败'
+        })
+    })
+})
+
+function judgeHas (arr, one) {
+    return arr.some((item) => {
+        return item === one
+    })
+}
+
+function delFiles (patharr) {
+    patharr.forEach((item) => {
+        let temp = path.resolve(__dirname, '../') + item
+        if (fs.existsSync(temp)) {
+            fs.unlinkSync(temp)
+        }
+    })
+}
+// 删除相册
+router.post('/del-album', function (req, res) {
+    let {delArr} = req.body
+    if (!Array.isArray(delArr)) {
+        res.status(400).json({
+            code: 0,
+            data: null,
+            message: '参数必须是路径数组'
+        })
+        return
+    }
+    ImageTable.findOne({
+        where: {openid: req.openid}
+    }).then((info) => {
+        if (info && info.dataValues.patharr) {
+            let pathArr = JSON.parse(info.dataValues.patharr)
+            pathArr = pathArr.filter((item) => {
+                return !judgeHas(delArr, item)
+            })
+            ImageTable.update(
+              {
+                patharr: JSON.stringify(pathArr)
+              },
+              {
+                where: {openid: req.openid}
+              }
+            ).then(() => {
+                delFiles(delArr)
+                res.json({
+                    code: 1,
+                    data: null,
+                    message: '删除成功'
+                })
+            })
+        } else {
+            res.json({
+                code: 1,
+                data: '',
+                message: '无相册可删'
+            })
+        }
+    }).catch((err) => {
+        res.json({
+            code: 0,
+            data: err,
+            message: '删除相册失败'
         })
     })
 })
