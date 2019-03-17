@@ -5,6 +5,13 @@ const path = require('path');
 
 router.get('/', async function(req, res){
   let {skuid, sessionid} = req.query;
+  if (!skuid || !sessionid) {
+    res.json({
+      code: 0,
+      data: null,
+      message: '截屏失败'
+    })
+  }
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.setViewport({
@@ -14,7 +21,14 @@ router.get('/', async function(req, res){
   let request_url = `https://ecs.nncz.cn/report/summary/${skuid}/${sessionid}#ping`;
   await page.goto(request_url, {
     waitUntil: 'domcontentloaded'
-  }).catch(err => console.log(err));
+  }).catch(err => {
+    console.log(err)
+    res.json({
+      code: 0,
+      data: null,
+      message: '截屏失败'
+    })
+  });
   try {
     await page.screenshot({
       path: path.join(__dirname, "../static/img"),
