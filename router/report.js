@@ -17,7 +17,7 @@ router.get('/', async function(req, res){
   }).catch(err => console.log(err));
   try {
     await page.screenshot({
-      path: `${path.join(__dirname, "../static/img")}/${skuid}-${sessionid}.jpg` ,
+      path: path.join(__dirname, "../static/img"),
       fullPage: true
     }).catch(err => {
       res.json({
