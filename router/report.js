@@ -36,8 +36,7 @@ router.get('/', async function(req, res){
       path: path.join(__dirname, `../static/img/${skuid + sessionid}.jpg`),
       fullPage: true,
       // type: 'png',
-      fullPage: false,
-      encoding: 'base64' 
+      encoding: 'utf-8' 
     }).catch(err => {
       res.json({
         code: 0,
