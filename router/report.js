@@ -12,7 +12,7 @@ router.get('/', async function(req, res){
       message: '截屏失败'
     })
   }
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
   const page = await browser.newPage();
   await page.setViewport({
     width: 750,
