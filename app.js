@@ -110,11 +110,14 @@ let router_static = require('./router/static')
 let router_wxapi = require('./router/wxapi')
 let router_views = require('./router/views')
 let router_upload = require('./router/upload')
+let router_report = require('./router/report')
+
 app.use('/api', router_api)
 app.use('/static', router_static)
 app.use('/wx', router_wxapi)
 app.use('/views', router_views)
 app.use('/upload', router_upload)
+app.use('/report', router_report)
 
 // console.log(app)
 // 将socket服务挂载到通过app构建的httpserver
