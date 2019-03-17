@@ -30,8 +30,9 @@ router.get('/', async function(req, res){
     })
   });
   try {
+    console.log(path.join(__dirname, `../static/img/${skuid + sessionid}.jpg`))
     await page.screenshot({
-      path: path.join(__dirname, "../static/img"),
+      path: path.join(__dirname, `../static/img/${skuid + sessionid}.jpg`),
       fullPage: true
     }).catch(err => {
       res.json({
@@ -42,7 +43,7 @@ router.get('/', async function(req, res){
     });
     res.json({
       code: 1,
-      data: `https://wx.nnleo.cn/static/img/${skuid}-${sessionid}.jpg`,
+      data: `https://wx.nnleo.cn/static/img/${skuid + sessionid}.jpg`,
       message: '截屏成功'
     })
   } catch (e) {
