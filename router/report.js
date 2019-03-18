@@ -18,8 +18,7 @@ router.get('/', async function(req, res){
     width: 750,
     height: 1334
   });
-  // let request_url = `https://ecs.nncz.cn/report/summary/${skuid}/${sessionid}#ping`;
-  let request_url = 'https://blog.nnleo.cn';
+  let request_url = `https://ecs.nncz.cn/report/summary/${skuid}/${sessionid}#ping`;
   await page.goto(request_url, {
     waitUntil: 'domcontentloaded'
   }).catch(err => {
