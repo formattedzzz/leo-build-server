@@ -4,3 +4,4 @@ upload/
 access.log
 .Ds_Store
 static/logs/
+config.js
