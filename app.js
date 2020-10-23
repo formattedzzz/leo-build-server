@@ -122,7 +122,7 @@ app.use('/views', router_views)
 app.use('/upload', router_upload)
 // app.use('/report', router_report)
 app.use('/weixin', router_weixin)
-app.use('resumption', router_resumption)
+app.use('/resumption', router_resumption)
 // console.log(app)
 // 将socket服务挂载到通过app构建的httpserver
 gameHub.init(httpserver)

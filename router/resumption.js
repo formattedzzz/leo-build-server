@@ -13,6 +13,7 @@ router.get('/', async function (req, res) {
     })
     .then(() => {
       setTimeout(() => {
+        page.close()
         res.json({
           code: 200,
           data: {
@@ -24,6 +25,7 @@ router.get('/', async function (req, res) {
     })
     .catch(err => {
       console.log(err)
+      page.close()
       res.status(500).json({
         code: 0,
         data: null,
