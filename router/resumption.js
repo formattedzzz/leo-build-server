@@ -12,16 +12,16 @@ router.get('/', async function (req, res) {
       waitUntil: 'domcontentloaded'
     })
     .then(() => {
+      res.json({
+        code: 200,
+        data: {
+          url
+        },
+        message: '访问成功'
+      })
       setTimeout(
         () => {
           page.close()
-          res.json({
-            code: 200,
-            data: {
-              url
-            },
-            message: '访问成功'
-          })
         },
         sec ? sec * 1000 : 6000
       )
