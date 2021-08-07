@@ -13,7 +13,7 @@ let config = require('./config')
 let mysqlOptions = {
   host: config.host,
   port: 3306,
-  user: 'formattedzzz',
+  user: 'root',
   password: config.password,
   database: config.database
 }
