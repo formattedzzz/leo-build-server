@@ -13,7 +13,7 @@ let config = require('./config')
 let mysqlOptions = {
   host: config.host,
   port: 3306,
-  user: 'root',
+  user: 'formattedzzz',
   password: config.password,
   database: config.database
 }
@@ -112,7 +112,7 @@ let router_views = require('./router/views')
 let router_upload = require('./router/upload')
 // let router_report = require('./router/report')
 let router_weixin = require('./router/weixin')
-let router_resumption = require('./router/resumption')
+// let router_resumption = require('./router/resumption')
 
 
 app.use('/api', router_api)
@@ -122,7 +122,7 @@ app.use('/views', router_views)
 app.use('/upload', router_upload)
 // app.use('/report', router_report)
 app.use('/weixin', router_weixin)
-app.use('/resumption', router_resumption)
+// app.use('/resumption', router_resumption)
 // console.log(app)
 // 将socket服务挂载到通过app构建的httpserver
 gameHub.init(httpserver)
