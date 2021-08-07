@@ -11,10 +11,10 @@ let JWT = require('jsonwebtoken')
 let morgan = require('morgan')
 let config = require('./config')
 let mysqlOptions = {
-  host: config.host,
-  port: 3306,
-  user: 'root',
-  password: config.password,
+  host: config.mysql_host,
+  port: config.mysql_port,
+  user: config.mysql_user,
+  password: config.mysql_pass,
   database: config.database
 }
 let gameHub = require('./game/GameHub.js')
