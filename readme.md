@@ -1,3 +1,4 @@
+[![Board Status](https://dev.azure.com/614791110/c5e8cd57-ad11-495e-bd4a-019821d85351/e51de8c3-8dde-4676-93c1-9992c93860e4/_apis/work/boardbadge/7763e60f-df21-4d2c-a1e3-e1004ae2c525)](https://dev.azure.com/614791110/c5e8cd57-ad11-495e-bd4a-019821d85351/_boards/board/t/e51de8c3-8dde-4676-93c1-9992c93860e4/Microsoft.RequirementCategory)
 - game          socket 相关代码
 - models        数据库表模型
 - router        模块路由
