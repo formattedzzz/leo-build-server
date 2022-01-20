@@ -13,6 +13,7 @@ router.get('/', async function (req, res) {
     })
     return
   }
+  url = decodeURIComponent(url)
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
   const page = await browser.newPage()
   await page.setViewport({
